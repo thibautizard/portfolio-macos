@@ -111,6 +111,18 @@ function WifiIcon() {
 	);
 }
 
+function HeaderDate() {
+	const { liveDate } = useLiveDate();
+	const { formattedDate, formattedTime } = formatDate(liveDate);
+
+	return (
+		<div className="flex items-center gap-x-2">
+			<div className="capitalize">{formattedDate}</div>
+			<div>{formattedTime}</div>
+		</div>
+	);
+}
+
 function formatDate(date: Date) {
 	const formatterDate = new Intl.DateTimeFormat("en-US", {
 		day: "2-digit",
@@ -132,19 +144,36 @@ function formatDate(date: Date) {
 		formattedTime,
 	};
 }
-function HeaderDate() {
-	const [date, setDate] = useState(new Date());
-	const { formattedDate, formattedTime } = formatDate(date);
+
+const ONE_MINUTE = 1000 * 60;
+function useLiveDate() {
+	const [liveDate, setLiveDate] = useState(new Date());
+
 	useEffect(() => {
-		const timer = setInterval(() => {
-			setDate(new Date());
-		}, 1000 * 60);
-		return () => clearInterval(timer);
+		const nextMinute = new Date();
+		nextMinute.setMinutes(nextMinute.getMinutes() + 1, 0, 0);
+		const delta = nextMinute.getTime() - Date.now();
+
+		let timeoutId: ReturnType<typeof setTimeout>;
+		let intervalId: ReturnType<typeof setInterval>;
+
+		function addOneMinute() {
+			setLiveDate((prevDate) => {
+				const newDate = new Date(prevDate);
+				newDate.setMinutes(newDate.getMinutes() + 1);
+				return newDate;
+			});
+		}
+
+		timeoutId = setTimeout(() => {
+			addOneMinute();
+			intervalId = setInterval(addOneMinute, ONE_MINUTE);
+		}, delta);
+
+		return () => {
+			clearTimeout(timeoutId);
+			clearInterval(intervalId);
+		};
 	}, []);
-	return (
-		<div className="flex items-center gap-x-2">
-			<div className="capitalize">{formattedDate}</div>
-			<div>{formattedTime}</div>
-		</div>
-	);
+	return { liveDate };
 }
