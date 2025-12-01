@@ -1,3 +1,4 @@
+import CalendarAppIcon from "@/assets/appIcons/calendar.png";
 import ContactAppIcon from "@/assets/appIcons/contact.png";
 import FinderAppIcon from "@/assets/appIcons/finder.png";
 import PhotosAppIcon from "@/assets/appIcons/photos.png";
@@ -13,8 +14,10 @@ export function Dock() {
 				<div className="flex items-center h-full gap-x-2 p-1.5 px-3">
 					<DockIcon alt="Finder" src={FinderAppIcon} />
 					<DockIcon alt="Safari" src={SafariAppIcon} />
+					<DockIcon alt="Calendar" src={CalendarAppIcon} />
 					<DockIcon alt="Contact" src={ContactAppIcon} />
 					<DockIcon alt="Photos" src={PhotosAppIcon} />
+					<div className="h-[85%] mx-2 w-px bg-white/20" />
 					<DockIcon alt="Trash" className="py-1" src={TrashAppIcon} />
 				</div>
 			</Glass>
