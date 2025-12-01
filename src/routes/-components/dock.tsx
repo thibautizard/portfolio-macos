@@ -4,18 +4,46 @@ import PhotosAppIcon from "@/assets/appIcons/photos.png";
 import SafariAppIcon from "@/assets/appIcons/safari.png";
 import TrashAppIcon from "@/assets/appIcons/trash.png";
 import { Glass } from "@/components/seraui/liquid-glass";
+import { cn } from "@/lib/utils";
+
 export function Dock() {
 	return (
-		<div className="h-[100px] overflow-hidden squircle-dock">
+		<div className="h-[100px] overflow-hidden squircle-dock border border-white/10">
 			<Glass className="h-full!">
 				<div className="flex items-center h-full gap-x-2 p-1.5 px-3">
-					<img alt="Finder" className="h-full" src={FinderAppIcon} />
-					<img alt="Safari" className="h-full" src={SafariAppIcon} />
-					<img alt="Contact" className="h-full" src={ContactAppIcon} />
-					<img alt="Photos" className="h-full" src={PhotosAppIcon} />
-					<img alt="Trash" className="h-full py-1" src={TrashAppIcon} />
+					<DockIcon alt="Finder" src={FinderAppIcon} />
+					<DockIcon alt="Safari" src={SafariAppIcon} />
+					<DockIcon alt="Contact" src={ContactAppIcon} />
+					<DockIcon alt="Photos" src={PhotosAppIcon} />
+					<DockIcon alt="Trash" className="py-1" src={TrashAppIcon} />
 				</div>
 			</Glass>
+		</div>
+	);
+}
+
+// ----------------------------------------------------------------
+function DockIcon({
+	src,
+	alt,
+	className,
+	active = false,
+}: {
+	src: string;
+	alt: string;
+	className?: string;
+	active?: boolean;
+}) {
+	return (
+		<div className={cn("h-full relative", className)}>
+			<img alt={alt} className="h-full" src={src} />
+			<div
+				className={cn(
+					"absolute -bottom-[2px] w-[4px] h-[4px] rounded-full left-1/2 -translate-x-1/2",
+					"bg-transparent",
+					active && "bg-white/50",
+				)}
+			/>
 		</div>
 	);
 }
