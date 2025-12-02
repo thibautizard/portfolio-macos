@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDarkMode, useOnClickOutside } from "usehooks-ts";
 import appleIcon from "@/assets/icons/apple.svg";
 import modeIcon from "@/assets/icons/mode.svg";
@@ -6,7 +6,6 @@ import wifiIcon from "@/assets/icons/wifi.svg";
 import { useLiveDate } from "@/hooks/use-live-date";
 import { cn } from "@/lib/utils";
 import { formatDateForHeader } from "@/routes/-utils/format-date-for-header";
-
 export function Header() {
 	return (
 		<header className="relative">
@@ -90,17 +89,12 @@ function WifiIcon() {
 	return <HeaderIcon alt="Wifi logo" className="size-[18px]" src={wifiIcon} />;
 }
 
-const battery: BatteryManager = await navigator?.getBattery();
-function BatteryIcon() {
-	const [batteryLevel, setBatteryLevel] = useState(battery.level);
-	battery.addEventListener("levelchange", () => {
-		setBatteryLevel(battery.level);
-	});
+// ----------------------------------------------------------------
+// 🔋 Battery
 
-	const [batteryCharging, setBatteryCharging] = useState(battery.charging);
-	battery.addEventListener("chargingchange", () => {
-		setBatteryCharging(battery.charging);
-	});
+function BatteryIcon() {
+	const { battery, batteryCharging, batteryLevel } = useBattery();
+	if (!battery) return null;
 
 	const baseWidthFull = 278;
 	const fillWidth = baseWidthFull * (batteryLevel ?? 1);
@@ -161,6 +155,55 @@ function BatteryIcon() {
 			{Battery}
 		</div>
 	);
+}
+
+function useBattery() {
+	const [battery, setBattery] = useState<BatteryManager | null>(null);
+	const [batteryLevel, setBatteryLevel] = useState(1);
+	const [batteryCharging, setBatteryCharging] = useState(false);
+
+	useEffect(() => {
+		const nav = navigator as NavigatorWithBattery;
+		if (!nav.getBattery) return;
+
+		nav.getBattery().then((bat) => {
+			setBattery(bat);
+			setBatteryLevel(bat.level);
+			setBatteryCharging(bat.charging);
+
+			const handleLevelChange = () => setBatteryLevel(bat.level);
+			const handleChargingChange = () => setBatteryCharging(bat.charging);
+
+			bat.addEventListener("levelchange", handleLevelChange);
+			bat.addEventListener("chargingchange", handleChargingChange);
+
+			// Cleanup listeners when component unmounts or battery changes (though battery instance is stable usually)
+			// We can attach cleanup to the return of this effect, but we need to keep reference to 'bat'
+			return () => {
+				bat.removeEventListener("levelchange", handleLevelChange);
+				bat.removeEventListener("chargingchange", handleChargingChange);
+			};
+		});
+	}, []);
+
+	return { battery, batteryCharging, batteryLevel };
+}
+
+interface BatteryManager extends EventTarget {
+	charging: boolean;
+	level: number;
+	addEventListener(
+		type: "chargingchange" | "levelchange",
+		listener: (this: BatteryManager, ev: Event) => void,
+	): void;
+	removeEventListener(
+		type: "chargingchange" | "levelchange",
+		listener: (this: BatteryManager, ev: Event) => void,
+	): void;
+}
+
+interface NavigatorWithBattery extends Navigator {
+	getBattery?: () => Promise<BatteryManager>;
 }
 
 function HeaderDate() {
