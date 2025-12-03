@@ -3,9 +3,25 @@ import { useDarkMode, useOnClickOutside } from "usehooks-ts";
 import appleIcon from "@/assets/icons/apple.svg";
 import modeIcon from "@/assets/icons/mode.svg";
 import wifiIcon from "@/assets/icons/wifi.svg";
+import {
+	Menu,
+	MenuCheckboxItem,
+	MenuGroup,
+	MenuGroupLabel,
+	MenuItem,
+	MenuPopup,
+	MenuRadioGroup,
+	MenuRadioItem,
+	MenuSeparator,
+	MenuSub,
+	MenuSubPopup,
+	MenuSubTrigger,
+	MenuTrigger,
+} from "@/components/ui/menu";
 import { useLiveDate } from "@/hooks/use-live-date";
 import { cn } from "@/lib/utils";
 import { formatDateForHeader } from "@/routes/-utils/format-date-for-header";
+
 export function Header() {
 	return (
 		<header className="relative">
@@ -102,7 +118,7 @@ function BatteryIcon() {
 	// ⚡
 	const Lightning = (
 		<svg
-			className="absolute z-10 top-1/2 left-[48%] -translate-x-1/2 -translate-y-1/2 size-[16px]"
+			className="absolute z-10 top-1/2 left-[48%] -translate-x-1/2 -translate-y-1/2 size-[14px]"
 			fill="none"
 			height="108"
 			viewBox="0 0 76 108"
@@ -122,7 +138,7 @@ function BatteryIcon() {
 	// 🔋
 	const Battery = (
 		<svg
-			className="size-6.5"
+			className="size-6"
 			fill="none"
 			height="175"
 			viewBox="0 0 367 175"
@@ -150,10 +166,10 @@ function BatteryIcon() {
 	);
 
 	return (
-		<div className="relative">
+		<HeaderIcon>
 			{batteryCharging ? Lightning : null}
 			{Battery}
-		</div>
+		</HeaderIcon>
 	);
 }
 
@@ -222,10 +238,12 @@ function HeaderIcon({
 	src,
 	alt,
 	className,
+	children,
 }: {
-	src: string;
-	alt: string;
+	src?: string;
+	alt?: string;
 	className?: string;
+	children?: React.ReactNode;
 }) {
 	const buttonRef = useRef<HTMLButtonElement>(null);
 	const [isClicked, setIsClicked] = useState(false);
@@ -233,19 +251,11 @@ function HeaderIcon({
 
 	const { isDarkMode } = useDarkMode();
 	const isLightMode = !isDarkMode;
-	return (
-		<button
-			className={cn(
-				"relative",
-				"before:opacity-0 before:inset-0 before:top-1/2 before:-translate-y-1/2 before:w-[40px] before:h-[24px] before:left-1/2 before:-translate-x-1/2",
-				"before:content-[''] before:absolute before:bg-white/15",
-				"before:rounded-full",
-				isClicked && "before:opacity-100",
-			)}
-			onClick={() => setIsClicked((prev) => !prev)}
-			ref={buttonRef}
-			type="button"
-		>
+
+	let ButtonContent = null;
+
+	if (src && alt) {
+		ButtonContent = (
 			<img
 				alt={alt}
 				className={cn(
@@ -256,6 +266,68 @@ function HeaderIcon({
 				)}
 				src={src}
 			/>
-		</button>
+		);
+	}
+
+	if (children) {
+		ButtonContent = children;
+	}
+
+	return (
+		<Menu>
+			<MenuTrigger>
+				{" "}
+				<button
+					className={cn(
+						"relative",
+						"before:opacity-0 before:inset-0 before:top-1/2 before:-translate-y-1/2 before:w-[40px] before:h-[24px] before:left-1/2 before:-translate-x-1/2",
+						"before:content-[''] before:absolute before:bg-white/15",
+						"before:rounded-full",
+						isClicked && "before:opacity-100",
+					)}
+					onClick={() => setIsClicked((prev) => !prev)}
+					ref={buttonRef}
+					type="button"
+				>
+					{ButtonContent}
+				</button>
+			</MenuTrigger>
+			<MenuPopup align="start" sideOffset={4}>
+				<MenuItem>Profile</MenuItem>
+				<MenuSeparator />
+
+				<MenuGroup>
+					<MenuGroupLabel>Battery</MenuGroupLabel>
+					<MenuItem>Play</MenuItem>
+					<MenuItem>Pause</MenuItem>
+				</MenuGroup>
+
+				<MenuSeparator />
+
+				<MenuCheckboxItem>Shuffle</MenuCheckboxItem>
+				<MenuCheckboxItem>Repeat</MenuCheckboxItem>
+
+				<MenuSeparator />
+
+				<MenuGroup>
+					<MenuGroupLabel>Sort by</MenuGroupLabel>
+					<MenuRadioGroup>
+						<MenuRadioItem>Artist</MenuRadioItem>
+						<MenuRadioItem>Album</MenuRadioItem>
+						<MenuRadioItem>Title</MenuRadioItem>
+					</MenuRadioGroup>
+				</MenuGroup>
+
+				<MenuSeparator />
+
+				<MenuSub>
+					<MenuSubTrigger>Add to playlist</MenuSubTrigger>
+					<MenuSubPopup>
+						<MenuItem>Jazz</MenuItem>
+						<MenuItem>Rock</MenuItem>
+					</MenuSubPopup>
+				</MenuSub>
+			</MenuPopup>
+		</Menu>
 	);
 }
