@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { type RefObject, useEffect, useRef, useState } from "react";
 import { useDarkMode, useOnClickOutside } from "usehooks-ts";
 import appleIcon from "@/assets/icons/apple.svg";
 import modeIcon from "@/assets/icons/mode.svg";
@@ -6,13 +6,11 @@ import wifiIcon from "@/assets/icons/wifi.svg";
 import {
 	Menu,
 	MenuCheckboxItem,
-	MenuGroup,
-	MenuGroupLabel,
-	MenuItem,
+	MenuGroup as MenuGroupBase,
+	MenuGroupLabel as MenuGroupLabelBase,
+	MenuItem as MenuItemBase,
 	MenuPopup,
-	MenuRadioGroup,
-	MenuRadioItem,
-	MenuSeparator,
+	MenuSeparator as MenuSeparatorBase,
 	MenuSub,
 	MenuSubPopup,
 	MenuSubTrigger,
@@ -108,12 +106,22 @@ function WifiIcon() {
 // ----------------------------------------------------------------
 // 🔋 Battery
 
-function BatteryIcon() {
+function Battery({
+	value = undefined,
+	strokeWidthLight = 7,
+	strokeWidthBattery = 19,
+	color = "white",
+}: {
+	value?: number;
+	strokeWidthLight?: number;
+	strokeWidthBattery?: number;
+	color?: string;
+}) {
 	const { battery, batteryCharging, batteryLevel } = useBattery();
 	if (!battery) return null;
 
 	const baseWidthFull = 278;
-	const fillWidth = baseWidthFull * (batteryLevel ?? 1);
+	const fillWidth = baseWidthFull * (value ?? batteryLevel ?? 1);
 
 	// ⚡
 	const Lightning = (
@@ -128,17 +136,17 @@ function BatteryIcon() {
 			<title>Lightning</title>
 			<path
 				d="M59.2785 2.44485C59.9191 2.81362 60.4148 3.38723 60.6847 4.07195C60.9545 4.75667 60.9826 5.51203 60.7643 6.21463L48.9763 44.2505H70.7261C71.3653 44.2502 71.9905 44.4358 72.5247 44.7844C73.0588 45.133 73.4785 45.6293 73.7319 46.212C73.9853 46.7947 74.0612 47.4384 73.9505 48.0635C73.8397 48.6886 73.547 49.2678 73.1085 49.7297L20.7468 104.977C20.2402 105.512 19.566 105.86 18.8341 105.966C18.1023 106.072 17.3559 105.928 16.7167 105.559C16.0775 105.19 15.5832 104.616 15.3142 103.932C15.0453 103.248 15.0176 102.493 15.2357 101.792L27.0237 63.7494H5.27392C4.63474 63.7496 4.00949 63.564 3.47533 63.2154C2.94117 62.8668 2.5215 62.3705 2.26812 61.7878C2.01475 61.2051 1.93875 60.5615 2.04952 59.9363C2.1603 59.3112 2.45298 58.732 2.89146 58.2702L55.2532 3.02331C55.7592 2.48904 56.4324 2.14046 57.1632 2.03425C57.894 1.92805 58.6395 2.07047 59.2785 2.43835V2.44485Z"
-				fill="white"
+				fill={color}
 				stroke="#2D84B1"
-				stroke-width="7"
+				stroke-width={strokeWidthLight}
 			/>
 		</svg>
 	);
 
 	// 🔋
-	const Battery = (
+	const BatteryIcon = (
 		<svg
-			className="size-6"
+			className="w-full aspect-square h-full"
 			fill="none"
 			height="175"
 			viewBox="0 0 367 175"
@@ -146,29 +154,37 @@ function BatteryIcon() {
 			xmlns="http://www.w3.org/2000/svg"
 		>
 			<title>Battery</title>
-			<rect fill="white" height="120" rx="23" width={fillWidth} x="31" y="28" />
+			<rect fill={color} height="120" rx="23" width={fillWidth} x="31" y="28" />
 			<rect
 				height="159"
 				rx="35"
-				stroke="white"
+				stroke={color}
 				stroke-opacity={0.5}
-				stroke-width="19"
+				stroke-width={strokeWidthBattery}
 				width="323"
 				x="8"
 				y="8"
 			/>
 			<path
 				d="M347 115.439V58C358 58 366.5 75.6902 366.5 87.5C366.5 98.773 359.5 115.439 347 115.439Z"
-				fill="white"
+				fill={color}
 				fill-opacity={0.5}
 			/>
 		</svg>
 	);
 
 	return (
-		<HeaderIcon>
+		<div className="size-6">
 			{batteryCharging ? Lightning : null}
-			{Battery}
+			{BatteryIcon}
+		</div>
+	);
+}
+
+function BatteryIcon() {
+	return (
+		<HeaderIcon className="size-6">
+			<Battery />
 		</HeaderIcon>
 	);
 }
@@ -245,9 +261,15 @@ function HeaderIcon({
 	className?: string;
 	children?: React.ReactNode;
 }) {
-	const buttonRef = useRef<HTMLButtonElement>(null);
+	const menuRef = useRef<HTMLDivElement>(null);
 	const [isClicked, setIsClicked] = useState(false);
-	useOnClickOutside<HTMLButtonElement>(buttonRef, () => setIsClicked(false));
+	const { batteryLevel } = useBattery();
+
+	const handleClickOutside = () => setIsClicked(false);
+	useOnClickOutside<HTMLDivElement>(
+		menuRef as RefObject<HTMLDivElement>,
+		handleClickOutside,
+	);
 
 	const { isDarkMode } = useDarkMode();
 	const isLightMode = !isDarkMode;
@@ -274,60 +296,107 @@ function HeaderIcon({
 	}
 
 	return (
-		<Menu>
-			<MenuTrigger>
-				{" "}
-				<button
+		<div ref={menuRef}>
+			<Menu>
+				<MenuTrigger
 					className={cn(
 						"relative",
+						"grid place-items-center",
 						"before:opacity-0 before:inset-0 before:top-1/2 before:-translate-y-1/2 before:w-[40px] before:h-[24px] before:left-1/2 before:-translate-x-1/2",
 						"before:content-[''] before:absolute before:bg-white/15",
 						"before:rounded-full",
 						isClicked && "before:opacity-100",
 					)}
 					onClick={() => setIsClicked((prev) => !prev)}
-					ref={buttonRef}
 					type="button"
 				>
 					{ButtonContent}
-				</button>
-			</MenuTrigger>
-			<MenuPopup align="start" sideOffset={4}>
-				<MenuItem>Profile</MenuItem>
-				<MenuSeparator />
+				</MenuTrigger>
+				<MenuPopup
+					align="start"
+					className="border-none bg-white/70 backdrop-blur-xs w-[305px] text-xs"
+					sideOffset={4}
+				>
+					{/* 🔋 Battery */}
+					<div className="flex flex-col my-2 mx-2">
+						<div className="text-[.82rem] mb-1.5 flex justify-between">
+							<span className="font-bold tracking-tight">Battery</span>
+							<span className="text-gray-600">{batteryLevel * 100} %</span>
+						</div>
+						<div className="text-gray-600">Power source: Battery</div>
+					</div>
 
-				<MenuGroup>
-					<MenuGroupLabel>Battery</MenuGroupLabel>
-					<MenuItem>Play</MenuItem>
-					<MenuItem>Pause</MenuItem>
-				</MenuGroup>
+					<MenuSeparator className="mx-2" />
 
-				<MenuSeparator />
+					{/* ⚡ Energy mode */}
+					<MenuGroup>
+						<MenuGroupLabel>Energy Mode</MenuGroupLabel>
+						<MenuItem>
+							<div className="size-6 p-1 rounded-full bg-black/10">
+								<Battery
+									color="var(--color-gray-700)"
+									strokeWidthBattery={29}
+									value={0.3}
+								/>
+							</div>
+							<span className="text-[.82rem]">Low Power</span>
+						</MenuItem>
+					</MenuGroup>
 
-				<MenuCheckboxItem>Shuffle</MenuCheckboxItem>
-				<MenuCheckboxItem>Repeat</MenuCheckboxItem>
+					<MenuSeparator className="my-1" />
 
-				<MenuSeparator />
+					{/* ⚙️ Battery settings */}
+					<MenuItem className="text-[.82rem] font-medium">
+						Battery Settings...
+					</MenuItem>
+				</MenuPopup>
+			</Menu>
+		</div>
+	);
+}
 
-				<MenuGroup>
-					<MenuGroupLabel>Sort by</MenuGroupLabel>
-					<MenuRadioGroup>
-						<MenuRadioItem>Artist</MenuRadioItem>
-						<MenuRadioItem>Album</MenuRadioItem>
-						<MenuRadioItem>Title</MenuRadioItem>
-					</MenuRadioGroup>
-				</MenuGroup>
+// -------------------------------------
+function MenuSeparator({ className }: { className?: string }) {
+	return (
+		<MenuSeparatorBase
+			className={cn("bg-gray-400 m-0 opacity-40", className)}
+		/>
+	);
+}
 
-				<MenuSeparator />
+function MenuItem({
+	children,
+	className,
+}: {
+	children: React.ReactNode;
+	className?: string;
+}) {
+	return (
+		<MenuItemBase
+			className={cn(
+				"rounded-lg py-[3px] data-highlighted:bg-black/5",
+				className,
+			)}
+		>
+			{children}
+		</MenuItemBase>
+	);
+}
 
-				<MenuSub>
-					<MenuSubTrigger>Add to playlist</MenuSubTrigger>
-					<MenuSubPopup>
-						<MenuItem>Jazz</MenuItem>
-						<MenuItem>Rock</MenuItem>
-					</MenuSubPopup>
-				</MenuSub>
-			</MenuPopup>
-		</Menu>
+function MenuGroup({ children }: { children: React.ReactNode }) {
+	return <MenuGroupBase>{children}</MenuGroupBase>;
+}
+
+function MenuGroupLabel({
+	className,
+	children,
+}: {
+	className?: string;
+	children: React.ReactNode;
+}) {
+	return (
+		<MenuGroupLabelBase className={cn("text-gray-600", className)}>
+			{children}
+		</MenuGroupLabelBase>
 	);
 }
