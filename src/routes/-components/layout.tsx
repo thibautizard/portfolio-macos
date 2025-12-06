@@ -2,7 +2,7 @@ import { useDarkMode } from "usehooks-ts";
 import wallpaperTahoeDark from "@/assets/wallpapers/wallpaper_tahoe_dark.avif";
 import wallpaperTahoeLight from "@/assets/wallpapers/wallpaper_tahoe_light.avif";
 import { Dock } from "./dock";
-import { Header } from "./header";
+import { Header } from "./header/header";
 
 export function Layout() {
 	const { isDarkMode } = useDarkMode();
