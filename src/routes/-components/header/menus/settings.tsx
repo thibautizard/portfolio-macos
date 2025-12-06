@@ -4,7 +4,7 @@ export function Settings() {
 	return (
 		<img
 			alt="Settings"
-			className={"size-[18px] relative invert"}
+			className={"size-[15px] relative invert"}
 			src={settingsIconsSrc}
 		/>
 	);

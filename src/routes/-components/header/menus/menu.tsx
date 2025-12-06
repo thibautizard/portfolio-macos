@@ -3,6 +3,7 @@
 import { Menu as MenuPrimitive } from "@base-ui-components/react/menu";
 import { CheckIcon, ChevronRightIcon } from "lucide-react";
 import type * as React from "react";
+import { useDarkMode } from "usehooks-ts";
 import { cn } from "@/lib/utils";
 
 const Menu = MenuPrimitive.Root;
@@ -18,7 +19,7 @@ function MenuTrigger(props: MenuPrimitive.Trigger.Props) {
 				"before:opacity-0 before:inset-0 before:top-1/2 before:-translate-y-1/2 before:w-[40px] before:h-[24px] before:left-1/2 before:-translate-x-1/2",
 				"before:content-[''] before:absolute before:bg-white/15",
 				"before:rounded-full",
-				// isClicked && "before:opacity-100",
+				"data-popup-open:before:opacity-100",
 			)}
 			data-slot="menu-trigger"
 			type="button"
@@ -41,6 +42,7 @@ function MenuPopup({
 	alignOffset?: MenuPrimitive.Positioner.Props["alignOffset"];
 	side?: MenuPrimitive.Positioner.Props["side"];
 }) {
+	const { isDarkMode } = useDarkMode();
 	return (
 		<MenuPrimitive.Portal>
 			<MenuPrimitive.Positioner
@@ -58,16 +60,16 @@ function MenuPopup({
 						"not-[class*='w-']:min-w-32",
 						"origin-(--transform-origin)",
 						"rounded-xl",
-						"border",
 						"bg-clip-padding",
 						"shadow-lg",
 						"transition-[scale,opacity]",
 						"before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)]",
 						"before:shadow-[0_1px_--theme(--color-black/4%)] dark:before:shadow-[0_-1px_--theme(--color-white/8%)]",
 						"has-data-starting-style:scale-98 has-data-starting-style:opacity-0",
-						"bg-white/60 backdrop-blur-2xl dark:bg-clip-border",
 						// Overrides
-						"border-none bg-white/70 backdrop-blur-xs w-[305px] text-xs",
+						"backdrop-blur-xs w-[305px] text-xs",
+						"bg-white/70 backdrop-blur-2xl",
+						isDarkMode && "bg-black/40 border border-white/5 backdrop-blur-2xl",
 						className,
 					)}
 					data-slot="menu-popup"
@@ -95,6 +97,7 @@ function MenuItem({
 	inset?: boolean;
 	variant?: "default" | "destructive";
 }) {
+	const { isDarkMode } = useDarkMode();
 	return (
 		<MenuPrimitive.Item
 			className={cn(
@@ -105,11 +108,14 @@ function MenuItem({
 				"rounded-sm outline-none",
 				"data-disabled:pointer-events-none data-inset:ps-8",
 				"data-[variant=destructive]:text-destructive-foreground",
-				"data-highlighted:text-accent-foreground data-highlighted:bg-accent ",
 				"data-disabled:opacity-64",
 				"[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 				// Overrides
 				"rounded-lg py-[3px] data-highlighted:bg-black/5",
+				"text-black",
+				isDarkMode && "text-white",
+				"data-highlighted:bg-black/10",
+				isDarkMode && "data-highlighted:bg-white/10",
 				className,
 			)}
 			data-inset={inset}
@@ -177,12 +183,15 @@ function MenuGroupLabel({
 }: MenuPrimitive.GroupLabel.Props & {
 	inset?: boolean;
 }) {
+	const { isDarkMode } = useDarkMode();
 	return (
 		<MenuPrimitive.GroupLabel
 			className={cn(
 				"px-2 py-1.5",
-				"font-bold text-gray-600 text-xs tracking-tight",
+				"font-bold text-xs tracking-tight",
 				"data-inset:ps-9 sm:data-inset:ps-8",
+				"text-gray-600",
+				isDarkMode && "text-gray-400",
 				className,
 			)}
 			data-inset={inset}
@@ -193,9 +202,14 @@ function MenuGroupLabel({
 }
 
 function MenuSeparator({ className, ...props }: MenuPrimitive.Separator.Props) {
+	const { isDarkMode } = useDarkMode();
 	return (
 		<MenuPrimitive.Separator
-			className={cn("h-px bg-gray-400 m-0 opacity-40", className)}
+			className={cn(
+				"h-px bg-gray-400 m-0 opacity-40",
+				isDarkMode && "bg-gray-600",
+				className,
+			)}
 			data-slot="menu-separator"
 			{...props}
 		/>

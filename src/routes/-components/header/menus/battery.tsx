@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useDarkMode } from "usehooks-ts";
+import { cn } from "@/lib/utils";
 import {
 	Menu,
 	MenuGroup,
@@ -11,21 +13,38 @@ import {
 
 export function Battery() {
 	const { batteryLevel } = useBattery();
+	const { isDarkMode } = useDarkMode();
 
 	return (
 		<div>
 			<Menu>
 				<MenuTrigger>
-					<BatteryIcon />
+					<div className="size-6">
+						<BatteryIcon />
+					</div>
 				</MenuTrigger>
 				<MenuPopup>
 					{/* 🔋 Battery */}
 					<div className="flex flex-col my-2 mx-2">
 						<div className="text-[.82rem] mb-1.5 flex justify-between">
-							<span className="font-bold tracking-tight">Battery</span>
-							<span className="text-gray-600">{batteryLevel * 100} %</span>
+							<span
+								className={cn(
+									"font-bold tracking-tight",
+									"text-black",
+									isDarkMode && "text-white",
+								)}
+							>
+								Battery
+							</span>
+							<span
+								className={cn("text-gray-600", isDarkMode && "text-gray-300")}
+							>
+								{batteryLevel * 100} %
+							</span>
 						</div>
-						<div className="text-gray-600">Power source: Battery</div>
+						<div className={cn("text-gray-600", isDarkMode && "text-gray-300")}>
+							Power source: Battery
+						</div>
 					</div>
 
 					<MenuSeparator className="mx-2" />
@@ -34,16 +53,22 @@ export function Battery() {
 					<MenuGroup>
 						<MenuGroupLabel>Energy Mode</MenuGroupLabel>
 						<MenuItem>
-							<div className="size-6 p-1 rounded-full bg-black/10">
-								<BatteryIcon
-									color="var(--color-gray-700)"
-									strokeWidthBattery={29}
-									value={0.3}
-								/>
+							<div
+								className={cn(
+									"size-[26px] p-0.5 rounded-full grid place-items-center",
+									"bg-black/10",
+									isDarkMode && "bg-white/10",
+								)}
+							>
+								<BatteryForPowerMode />
 							</div>
 							<span className="text-[.82rem]">Low Power</span>
 						</MenuItem>
 					</MenuGroup>
+
+					{/* <MenuSeparator className="mx-2" />
+
+					<div>No app using significant energy</div> */}
 
 					<MenuSeparator className="my-1" />
 
@@ -98,9 +123,9 @@ function BatteryIcon({
 	);
 
 	// 🔋
-	const BatteryIcon = (
+	const BaseBatteryIcon = (
 		<svg
-			className="w-full aspect-square h-full"
+			className="aspect-square w-full h-full"
 			fill="none"
 			height="175"
 			viewBox="0 0 367 175"
@@ -128,10 +153,55 @@ function BatteryIcon({
 	);
 
 	return (
-		<div className="size-6">
+		<>
 			{batteryCharging ? Lightning : null}
-			{BatteryIcon}
-		</div>
+			{BaseBatteryIcon}
+		</>
+	);
+}
+
+function BatteryForPowerMode() {
+	const { isDarkMode } = useDarkMode();
+	const batteryLevel = 0.3;
+	const baseWidthFull = 278;
+	const fillWidth = baseWidthFull * batteryLevel;
+	const batteryColor = isDarkMode
+		? "var(--color-gray-300)"
+		: "var(--color-gray-600)";
+	return (
+		<svg
+			className="aspect-square w-full h-full"
+			fill="none"
+			height="175"
+			viewBox="0 0 367 175"
+			width="367"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<title>Battery</title>
+			<rect
+				fill={batteryColor}
+				height="100"
+				rx="23"
+				width={fillWidth}
+				x="40"
+				y="36"
+			/>
+			<rect
+				height="159"
+				rx="35"
+				stroke={batteryColor}
+				stroke-opacity={0.5}
+				stroke-width={25}
+				width="323"
+				x="8"
+				y="8"
+			/>
+			<path
+				d="M347 115.439V58C358 58 366.5 75.6902 366.5 87.5C366.5 98.773 359.5 115.439 347 115.439Z"
+				fill={batteryColor}
+				fill-opacity={0.5}
+			/>
+		</svg>
 	);
 }
 
