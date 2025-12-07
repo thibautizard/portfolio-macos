@@ -1,17 +1,20 @@
 export function formatDateForHeader(date: Date) {
-	const formatterDate = new Intl.DateTimeFormat("en-US", {
-		day: "2-digit",
-		month: "short",
+	const locale =
+		typeof navigator !== "undefined" ? navigator.language : undefined;
+
+	const weekdayFormatter = new Intl.DateTimeFormat(locale, {
 		weekday: "short",
 	});
+	const dayFormatter = new Intl.DateTimeFormat(locale, { day: "numeric" });
+	const monthFormatter = new Intl.DateTimeFormat(locale, { month: "short" });
 
-	const formatterTime = new Intl.DateTimeFormat("en-US", {
+	const formatterTime = new Intl.DateTimeFormat(locale, {
 		hour: "numeric",
 		hourCycle: "h24",
 		minute: "numeric",
 	});
 
-	const formattedDate = formatterDate.format(date);
+	const formattedDate = `${weekdayFormatter.format(date)} ${dayFormatter.format(date)} ${monthFormatter.format(date)}`;
 	const formattedTime = formatterTime.format(date);
 
 	return {
