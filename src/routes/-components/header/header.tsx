@@ -4,7 +4,7 @@ import { Apple } from "./menus/apple";
 import { Battery } from "./menus/battery";
 import { Settings } from "./menus/settings";
 import { Time } from "./menus/time";
-import { Wifi } from "./menus/wifi";
+// import { Wifi } from "./menus/wifi";
 
 export function Header() {
 	return (
@@ -26,7 +26,7 @@ export function Header() {
 				{/* ➡️ Right part */}
 				<div className="flex gap-x-5 items-center">
 					<Battery />
-					<Wifi />
+					{/* <Wifi /> */}
 					<Settings />
 					<Time />
 				</div>
