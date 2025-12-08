@@ -141,7 +141,7 @@ code {
     @apply bg-background text-foreground;
   }
 
-  .squircle-dock {
+  .squircle {
     corner-shape: squircle;
     }
 

@@ -24,7 +24,7 @@ export function Dock() {
 			<Tooltip />
 			{/* Dock container */}
 			<div
-				className="overflow-hidden squircle-dock"
+				className="overflow-hidden squircle"
 				style={{ height: `${height}px` }}
 			>
 				<Glass className="h-full!">

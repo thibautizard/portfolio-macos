@@ -32,7 +32,7 @@ function MenuPopup({
 	children,
 	className,
 	sideOffset = 4,
-	align = "start",
+	align = "end",
 	alignOffset = 0,
 	side = "bottom",
 	...props

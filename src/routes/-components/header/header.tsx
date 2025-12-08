@@ -1,7 +1,5 @@
 import { useDarkMode } from "usehooks-ts";
-import PlayIcon from "@/assets/icons/play.tsx";
 // import { Wifi } from "./menus/wifi";
-import GlassSurface from "@/components/GlassSurface";
 import { cn } from "@/lib/utils";
 import { Apple } from "./menus/apple";
 import { Battery } from "./menus/battery";
@@ -30,31 +28,6 @@ export function Header() {
 					{/* <Wifi /> */}
 					<Settings />
 					<Time />
-					<div className="hover:bg-white/3 bg-transparent transition rounded-[36px]">
-						<GlassSurface
-							backgroundOpacity={0.1}
-							borderRadius={36}
-							className="p-2 text-white border-blue-400/30 border"
-							height={150}
-							width={150}
-						>
-							<div className="flex flex-col justify-between h-full">
-								<div className="size-10 rounded-md bg-white/20" />
-								<div className="font-bold block text-xs">Not Playing</div>
-								<div className="flex items-center gap-x-4">
-									<div className="flex scale-x-[-1] opacity-30">
-										<PlayIcon className="size-4" />
-										<PlayIcon className="-ml-[3px] size-4" />
-									</div>
-									<PlayIcon className="opacity-80" />
-									<div className="flex opacity-30">
-										<PlayIcon className="size-4" />
-										<PlayIcon className="-ml-[3px] size-4" />
-									</div>
-								</div>
-							</div>
-						</GlassSurface>
-					</div>
 				</div>
 			</div>
 		</header>
