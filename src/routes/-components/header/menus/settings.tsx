@@ -1,7 +1,10 @@
 import { SunDimIcon, SunIcon } from "lucide-react";
+import { motion, useMotionValue, useMotionValueEvent } from "motion/react";
+import { type MouseEventHandler, useEffect, useRef, useState } from "react";
+import { useDarkMode } from "usehooks-ts";
 import PlayIcon from "@/assets/icons/play.tsx";
 import settingsIconsSrc from "@/assets/icons/settings.svg";
-import GlassSurface from "@/components/GlassSurface";
+import GlassSurface from "@/components/react-bits/glass-surface";
 import { cn } from "@/lib/utils";
 
 export function Settings() {
@@ -22,25 +25,8 @@ export function Settings() {
 			>
 				<MusicPlayer />
 				<MusicPlayer />
-				<div className="col-span-2 row-span-4">
-					<GlassSurface
-						backgroundOpacity={0.15}
-						borderRadius={36}
-						className="px-2 py-1 w-full! h-full! text-white border-blue-400/30 border"
-						style={{
-							cornerShape: "superellipse(1.5)",
-						}}
-					>
-						<div className="text-[12.5px] font-bold flex flex-col gap-y-2 justify-start w-full">
-							<div>Display</div>
-							<div className="flex gap-x-2 items-center">
-								<SunDimIcon fill="white" size={20} />
-								<div className="h-1 rounded-md grow bg-white" />
-								<SunIcon fill="white" size={20} />
-							</div>
-						</div>
-					</GlassSurface>
-				</div>
+				<DisplaySlider />
+				<VolumeSlider />
 			</div>
 		</div>
 	);
@@ -75,5 +61,197 @@ function MusicPlayer() {
 				</div>
 			</GlassSurface>
 		</div>
+	);
+}
+
+// -----------------------------------------
+function DisplaySlider() {
+	return (
+		<GlassLong name="Display">
+			<div className="flex gap-x-2 items-center">
+				<SunDimIcon fill="white" size={20} />
+				<Slider />
+				<SunIcon fill="white" size={20} />
+			</div>
+		</GlassLong>
+	);
+}
+
+// -----------------------------------------
+function VolumeSlider() {
+	return (
+		<GlassLong name="Sound">
+			<div className="flex gap-x-2 items-center">
+				<SoundEmpty />
+				<div className="h-1 rounded-md grow bg-white" />
+				<SoundFull />
+			</div>
+		</GlassLong>
+	);
+}
+
+// -----------------------------------------
+function GlassLong({
+	children,
+	name,
+}: {
+	children: React.ReactNode;
+	name: string;
+}) {
+	return (
+		<div className="col-span-2 row-span-4">
+			<GlassSurface
+				backgroundOpacity={0.15}
+				borderRadius={36}
+				className="px-2 py-1 w-full! h-full! text-white border-blue-400/30 border"
+				style={{
+					cornerShape: "superellipse(1.5)",
+				}}
+			>
+				<div className="text-[12.5px] font-bold flex flex-col gap-y-2 justify-start w-full">
+					<div>{name}</div>
+					{children}
+				</div>
+			</GlassSurface>
+		</div>
+	);
+}
+
+// -----------------------------------------
+function Slider() {
+	const [isDragging, setIsDragging] = useState(false);
+	const { isDarkMode } = useDarkMode();
+	const dragRef = useRef<HTMLButtonElement>(null);
+	const startDragPosition = useRef(0);
+	const sliderRef = useRef<HTMLDivElement>(null);
+	const sliderRefWidth = sliderRef.current?.offsetWidth;
+
+	const [value, setValue] = useState(30);
+	const x = useMotionValue(0);
+
+	useMotionValueEvent(x, "change", (latest) => {
+		if (sliderRefWidth) {
+			const newValue = (latest / sliderRefWidth) * 100;
+			setValue(newValue);
+		}
+	});
+	const handleMouseDown = (e: MouseEvent) => {
+		setIsDragging(true);
+		startDragPosition.current = e.clientX;
+	};
+
+	useEffect(() => {
+		const handleMouseMove = (e: MouseEvent) => {
+			if (!isDragging) return;
+			const { clientX } = e;
+			const delta = clientX - startDragPosition.current;
+			const newX = x.get() + delta;
+			if (sliderRef.current) {
+				const { left, right } = sliderRef.current.getBoundingClientRect();
+				const leftDiff = left - startDragPosition.current;
+				const rightDiff = right - startDragPosition.current;
+				const xDiff = x.get() - newX;
+				if (xDiff < leftDiff) {
+					x.set(leftDiff);
+				} else if (xDiff > rightDiff) {
+					x.set(rightDiff);
+				} else {
+					x.set(newX);
+				}
+				x.set(newX);
+				startDragPosition.current = clientX;
+			}
+		};
+
+		const handleMouseUp = () => {
+			setIsDragging(false);
+		};
+		if (isDragging) {
+			document.addEventListener("mousemove", handleMouseMove);
+			document.addEventListener("mouseup", handleMouseUp);
+		}
+		return () => {
+			document.removeEventListener("mousemove", handleMouseMove);
+			document.removeEventListener("mouseup", handleMouseUp);
+		};
+	}, [isDragging, x.get, x.set]);
+
+	return (
+		<div
+			className={cn(
+				"h-1 relative rounded-md grow ",
+				isDarkMode && "bg-[#173FAF]",
+			)}
+			ref={sliderRef}
+		>
+			<div
+				className="bg-white rounded-md h-full"
+				style={{ width: `${value}%` }}
+			/>
+			<motion.button
+				className="absolute -translate-y-1/2 top-1/2"
+				onMouseDown={
+					handleMouseDown as unknown as MouseEventHandler<HTMLButtonElement>
+				}
+				ref={dragRef}
+				style={{
+					x,
+				}}
+				type="button"
+			>
+				<div
+					className="w-5 rounded-full h-3.5 bg-white"
+					style={{
+						cornerShape: "superellipse(1.3)",
+					}}
+				/>
+			</motion.button>
+		</div>
+	);
+}
+
+// -----------------------------------------
+function SoundEmpty() {
+	return (
+		<svg
+			height="24"
+			viewBox="0 0 24 24"
+			width="24"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<title>Sound Empty</title>
+			<g fill="none">
+				<path
+					d="M4.158 13.93a3.75 3.75 0 0 1 0-3.86a1.5 1.5 0 0 1 .993-.7l1.693-.339a.45.45 0 0 0 .258-.153L9.17 6.395c1.182-1.42 1.774-2.129 2.301-1.938S12 5.572 12 7.42v9.162c0 1.847 0 2.77-.528 2.962c-.527.19-1.119-.519-2.301-1.938L7.1 15.122a.45.45 0 0 0-.257-.153L5.15 14.63a1.5 1.5 0 0 1-.993-.7"
+					fill="currentColor"
+				/>
+			</g>
+		</svg>
+	);
+}
+
+// -----------------------------------------
+function SoundFull() {
+	return (
+		<svg
+			height="24"
+			viewBox="0 0 24 24"
+			width="24"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<title>Sound Full</title>
+			<g fill="none">
+				<path
+					d="M4.158 13.93a3.75 3.75 0 0 1 0-3.86a1.5 1.5 0 0 1 .993-.7l1.693-.339a.45.45 0 0 0 .258-.153L9.17 6.395c1.182-1.42 1.774-2.129 2.301-1.938S12 5.572 12 7.42v9.162c0 1.847 0 2.77-.528 2.962c-.527.19-1.119-.519-2.301-1.938L7.1 15.122a.45.45 0 0 0-.257-.153L5.15 14.63a1.5 1.5 0 0 1-.993-.7"
+					fill="currentColor"
+				/>
+				<path
+					d="M14.536 8.464a5 5 0 0 1 .027 7.044m4.094-9.165a8 8 0 0 1 .044 11.27"
+					stroke="currentColor"
+					stroke-linecap="round"
+					stroke-width="1"
+				/>
+			</g>
+		</svg>
 	);
 }

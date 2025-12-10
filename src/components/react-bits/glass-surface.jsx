@@ -1,5 +1,5 @@
-import { useEffect, useId, useRef } from "react";
-import "./GlassSurface.css";
+import { useCallback, useEffect, useId, useRef } from "react";
+import "./glass-surface.css";
 
 const GlassSurface = ({
 	children,
@@ -35,7 +35,7 @@ const GlassSurface = ({
 	const blueChannelRef = useRef(null);
 	const gaussianBlurRef = useRef(null);
 
-	const generateDisplacementMap = () => {
+	const generateDisplacementMap = useCallback(() => {
 		const rect = containerRef.current?.getBoundingClientRect();
 		const actualWidth = rect?.width || 400;
 		const actualHeight = rect?.height || 200;
@@ -61,11 +61,20 @@ const GlassSurface = ({
     `;
 
 		return `data:image/svg+xml,${encodeURIComponent(svgContent)}`;
-	};
+	}, [
+		borderRadius,
+		borderWidth,
+		brightness,
+		opacity,
+		blur,
+		mixBlendMode,
+		redGradId,
+		blueGradId,
+	]);
 
-	const updateDisplacementMap = () => {
+	const updateDisplacementMap = useCallback(() => {
 		feImageRef.current?.setAttribute("href", generateDisplacementMap());
-	};
+	}, [generateDisplacementMap]);
 
 	useEffect(() => {
 		updateDisplacementMap();
@@ -87,13 +96,6 @@ const GlassSurface = ({
 		gaussianBlurRef.current?.setAttribute("stdDeviation", displace.toString());
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
-		width,
-		height,
-		borderRadius,
-		borderWidth,
-		brightness,
-		opacity,
-		blur,
 		displace,
 		distortionScale,
 		redOffset,
@@ -101,7 +103,7 @@ const GlassSurface = ({
 		blueOffset,
 		xChannel,
 		yChannel,
-		mixBlendMode,
+		updateDisplacementMap,
 	]);
 
 	useEffect(() => {
@@ -117,7 +119,7 @@ const GlassSurface = ({
 			resizeObserver.disconnect();
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [updateDisplacementMap]);
 
 	useEffect(() => {
 		if (!containerRef.current) return;
@@ -132,12 +134,12 @@ const GlassSurface = ({
 			resizeObserver.disconnect();
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [updateDisplacementMap]);
 
 	useEffect(() => {
 		setTimeout(updateDisplacementMap, 0);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [width, height]);
+	}, [updateDisplacementMap]);
 
 	const supportsSVGFilters = () => {
 		const isWebkit =
@@ -169,7 +171,11 @@ const GlassSurface = ({
 			ref={containerRef}
 			style={containerStyle}
 		>
-			<svg className="glass-surface__filter" xmlns="http://www.w3.org/2000/svg">
+			<svg
+				aria-hidden="true"
+				className="glass-surface__filter"
+				xmlns="http://www.w3.org/2000/svg"
+			>
 				<defs>
 					<filter
 						colorInterpolationFilters="sRGB"
@@ -190,7 +196,6 @@ const GlassSurface = ({
 						/>
 
 						<feDisplacementMap
-							id="redchannel"
 							in="SourceGraphic"
 							in2="map"
 							ref={redChannelRef}
@@ -207,7 +212,6 @@ const GlassSurface = ({
 						/>
 
 						<feDisplacementMap
-							id="greenchannel"
 							in="SourceGraphic"
 							in2="map"
 							ref={greenChannelRef}
@@ -224,7 +228,6 @@ const GlassSurface = ({
 						/>
 
 						<feDisplacementMap
-							id="bluechannel"
 							in="SourceGraphic"
 							in2="map"
 							ref={blueChannelRef}
