@@ -1,6 +1,13 @@
 import { SunDimIcon, SunIcon } from "lucide-react";
 import { motion, useMotionValue, useMotionValueEvent } from "motion/react";
-import { type MouseEventHandler, useEffect, useRef, useState } from "react";
+import {
+	type MouseEventHandler,
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
 import { useDarkMode } from "usehooks-ts";
 import PlayIcon from "@/assets/icons/play.tsx";
 import settingsIconsSrc from "@/assets/icons/settings.svg";
@@ -124,40 +131,50 @@ function Slider() {
 	const dragRef = useRef<HTMLButtonElement>(null);
 	const startDragPosition = useRef(0);
 	const sliderRef = useRef<HTMLDivElement>(null);
-	const sliderRefWidth = sliderRef.current?.offsetWidth;
+	const handlerRef = useRef<HTMLDivElement>(null);
 
-	const [value, setValue] = useState(30);
+	const [value, setValue] = useState(100);
 	const x = useMotionValue(0);
 
+	const [sliderWidth, setSliderWidth] = useState(0);
+	const [handlerWidth, setHandlerWidth] = useState(0);
+	const maxRight = sliderWidth - handlerWidth;
+
+	useLayoutEffect(() => {
+		if (sliderRef.current) {
+			setSliderWidth(sliderRef.current.offsetWidth);
+		}
+		if (handlerRef.current) {
+			setHandlerWidth(handlerRef.current.offsetWidth);
+		}
+
+		let initialX = (value * sliderWidth) / 100;
+		if (initialX > maxRight) initialX = maxRight;
+		x.set(initialX);
+	}, [sliderWidth, value, x.set, maxRight]);
+
 	useMotionValueEvent(x, "change", (latest) => {
-		if (sliderRefWidth) {
-			const newValue = (latest / sliderRefWidth) * 100;
+		if (sliderWidth) {
+			let newValue = (latest / sliderWidth) * 100;
+			if (newValue < 0) newValue = 0;
+			if (newValue > 100) newValue = 100;
 			setValue(newValue);
 		}
 	});
-	const handleMouseDown = (e: MouseEvent) => {
+	const handleMouseDown = useCallback((e: MouseEvent) => {
 		setIsDragging(true);
 		startDragPosition.current = e.clientX;
-	};
+	}, []);
 
 	useEffect(() => {
 		const handleMouseMove = (e: MouseEvent) => {
 			if (!isDragging) return;
-			const { clientX } = e;
-			const delta = clientX - startDragPosition.current;
-			const newX = x.get() + delta;
-			if (sliderRef.current) {
-				const { left, right } = sliderRef.current.getBoundingClientRect();
-				const leftDiff = left - startDragPosition.current;
-				const rightDiff = right - startDragPosition.current;
-				const xDiff = x.get() - newX;
-				if (xDiff < leftDiff) {
-					x.set(leftDiff);
-				} else if (xDiff > rightDiff) {
-					x.set(rightDiff);
-				} else {
-					x.set(newX);
-				}
+			if (sliderWidth && handlerWidth) {
+				const { clientX } = e;
+				const delta = clientX - startDragPosition.current;
+				let newX = x.get() + delta;
+				if (newX < 0) newX = 0;
+				if (newX > maxRight) newX = maxRight;
 				x.set(newX);
 				startDragPosition.current = clientX;
 			}
@@ -174,7 +191,7 @@ function Slider() {
 			document.removeEventListener("mousemove", handleMouseMove);
 			document.removeEventListener("mouseup", handleMouseUp);
 		};
-	}, [isDragging, x.get, x.set]);
+	}, [isDragging, x.get, x.set, handlerWidth, sliderWidth, maxRight]);
 
 	return (
 		<div
@@ -201,6 +218,7 @@ function Slider() {
 			>
 				<div
 					className="w-5 rounded-full h-3.5 bg-white"
+					ref={handlerRef}
 					style={{
 						cornerShape: "superellipse(1.3)",
 					}}
