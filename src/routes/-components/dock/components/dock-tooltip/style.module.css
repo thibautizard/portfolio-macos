@@ -1,0 +1,55 @@
+.tooltip {
+	--height: 35px;
+	--min-width: 80px;
+	--ah: 9px;
+	--aw: 14px;
+
+	--arrow-middle-height: 4px;
+	--arrow-curve-height: 3px;
+	--curve-base-arrow: 3px;
+
+	--r: calc((var(--height) / 1.4) - var(--ah));
+	--middle-radius: calc((100% - var(--ah)) / 2);
+	--start-top-left-radius-x: var(--r);
+	--start-top-left-radius-y: 0;
+	--start-top-right-radius-x: calc(100% - var(--r));
+	--start-bottom-right-radius-x: calc(100% - var(--r));
+	--start-bottom-right-radius-y: calc(100% - var(--ah));
+
+	--start-arrow-right: calc(50% + (var(--aw) / 2));
+
+	position: relative;
+	height: var(--height);
+	min-width: var(--min-width);
+	/* biome-ignore lint/correctness/noUnknownProperty: CSS Borders 4 (Chrome 139+) */
+	border-shape: shape(
+		from var(--start-top-left-radius-x) var(--start-top-left-radius-y),
+		hline to var(--start-top-right-radius-x),
+		curve to right var(--middle-radius) with right top,
+		curve to var(--start-bottom-right-radius-x)
+			var(--start-bottom-right-radius-y) with right
+			var(--start-bottom-right-radius-y),
+		hline to var(--start-arrow-right),
+		curve by calc((var(--aw) / 3) * -1) var(--arrow-middle-height) with
+			calc(var(--curve-base-arrow) * -1) 0px,
+		curve by calc((var(--aw) / 3) * -1) 0px with calc((var(--aw) / 3 / 2) * -1)
+			var(--arrow-curve-height),
+		curve by calc((var(--aw) / 3) * -1) calc(var(--arrow-middle-height) * -1)
+			with calc((var(--curve-base-arrow) - 1.5px) * -1)
+			calc(var(--arrow-middle-height) * -1),
+		hline to var(--r),
+		curve to left calc(100% - (var(--r) + var(--ah))) with left
+			calc(100% - var(--ah)),
+		vline to var(--r),
+		curve to var(--r) top with left top
+	);
+}
+
+.tooltipContent {
+	position: relative;
+	display: block;
+	width: fit-content;
+	margin: auto;
+	line-height: 1;
+	transform: translate(0px, calc(var(--height) / 7));
+}

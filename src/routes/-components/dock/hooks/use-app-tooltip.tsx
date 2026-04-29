@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { DockTooltip } from "../components/dock-tooltip";
+import { DockTooltip } from "../components/dock-tooltip/dock-tooltip";
 export function useAppTooltip({ isDockResizing }: { isDockResizing: boolean }) {
 	const [tooltipData, setTooltipData] = useState<{
 		name: string;
@@ -8,23 +8,26 @@ export function useAppTooltip({ isDockResizing }: { isDockResizing: boolean }) {
 		width: number;
 	} | null>(null);
 
-	if (isDockResizing && tooltipData) {
-		setTooltipData(null);
-	}
+	if (isDockResizing && tooltipData) setTooltipData(null);
 
+	// ❗
 	const showTooltip = (el: HTMLElement | null, name: string) => {
 		if (!el) {
 			setTooltipData(null);
 			return;
 		}
-		const rect = el.getBoundingClientRect();
+
+		const { width, left, top } = el.getBoundingClientRect();
+
 		setTooltipData({
 			name,
-			width: rect.width,
-			x: rect.left,
-			y: rect.top,
+			width,
+			x: left,
+			y: top,
 		});
 	};
+
+	// 💬
 	const Tooltip = useCallback(
 		() =>
 			tooltipData ? (
