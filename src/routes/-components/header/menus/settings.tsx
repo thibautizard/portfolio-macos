@@ -1,13 +1,6 @@
 import { SunDimIcon, SunIcon } from "lucide-react";
 import { motion, useMotionValue, useMotionValueEvent } from "motion/react";
-import {
-  type MouseEventHandler,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useDarkMode } from "usehooks-ts";
 import PlayIcon from "@/assets/icons/play.tsx";
 import settingsIconsSrc from "@/assets/icons/settings.svg";
@@ -18,12 +11,11 @@ const BACKGROUND_OPACITY = 0.17;
 
 export function Settings() {
   const [isOpened, setIsOpened] = useState(false);
-  const toggleOpen = useCallback(() => setIsOpened(!isOpened), [isOpened]);
   return (
     <div>
       <button
         className="size-fit grid place-items-center"
-        onClick={toggleOpen}
+        onClick={() => setIsOpened((o) => !o)}
         type="button"
       >
         <SettingsIcon />
@@ -115,12 +107,19 @@ function DisplaySlider() {
   return (
     <GlassLong name="Display">
       <div className="flex gap-x-2 items-center">
-        <SunDimIcon fill="white" size={20} />
+        <SunDim />
         <Slider />
-        <SunIcon fill="white" size={20} />
+        <Sun />
       </div>
     </GlassLong>
   );
+}
+
+function SunDim() {
+  return <SunDimIcon fill="white" size={20} />;
+}
+function Sun() {
+  return <SunIcon fill="white" size={20} />;
 }
 
 // -----------------------------------------
@@ -166,7 +165,7 @@ function GlassLong({
   name: string;
 }) {
   return (
-    <div className="col-span-2 row-span-4">
+    <div className="col-span-2 group row-span-4">
       <GlassSurface
         backgroundOpacity={BACKGROUND_OPACITY}
         borderRadius={36}
@@ -191,10 +190,7 @@ function GlassLong({
 
 // -----------------------------------------
 function Slider() {
-  const [isDragging, setIsDragging] = useState(false);
   const { isDarkMode } = useDarkMode();
-  const dragRef = useRef<HTMLButtonElement>(null);
-  const startDragPosition = useRef(0);
   const sliderRef = useRef<HTMLDivElement>(null);
   const handlerRef = useRef<HTMLDivElement>(null);
 
@@ -216,7 +212,7 @@ function Slider() {
     let initialX = (value * sliderWidth) / 100;
     if (initialX > maxRight) initialX = maxRight;
     x.set(initialX);
-  }, [sliderWidth, value, x.set, maxRight]);
+  }, [sliderWidth, value, x, maxRight]);
 
   useMotionValueEvent(x, "change", (latest) => {
     if (sliderWidth) {
@@ -226,42 +222,11 @@ function Slider() {
       setValue(newValue);
     }
   });
-  const handleMouseDown = useCallback((e: MouseEvent) => {
-    setIsDragging(true);
-    startDragPosition.current = e.clientX;
-  }, []);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging) return;
-      if (sliderWidth && handlerWidth) {
-        const { clientX } = e;
-        const delta = clientX - startDragPosition.current;
-        let newX = x.get() + delta;
-        if (newX < 0) newX = 0;
-        if (newX > maxRight) newX = maxRight;
-        x.set(newX);
-        startDragPosition.current = clientX;
-      }
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-    if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-    }
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging, x.get, x.set, handlerWidth, sliderWidth, maxRight]);
 
   return (
     <div
       className={cn(
-        "h-1 relative rounded-md grow ",
+        "h-1 relative rounded-md grow",
         isDarkMode && "bg-[#173FAF]",
       )}
       ref={sliderRef}
@@ -271,14 +236,17 @@ function Slider() {
         style={{ width: `${value}%` }}
       />
       <motion.button
-        className="absolute -translate-y-1/2 top-1/2"
-        onMouseDown={
-          handleMouseDown as unknown as MouseEventHandler<HTMLButtonElement>
-        }
-        ref={dragRef}
-        style={{
-          x,
-        }}
+        className={cn(
+          "hidden",
+          "group-hover:block",
+          "absolute",
+          "-translate-y-1/2 top-1/2",
+        )}
+        drag="x"
+        dragConstraints={{ left: 0, right: maxRight }}
+        dragElastic={0}
+        dragMomentum={false}
+        style={{ x }}
         type="button"
       >
         <div
