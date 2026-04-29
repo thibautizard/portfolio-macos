@@ -30,7 +30,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				name: "viewport",
 			},
 			{
-				title: "MacOS Portfolio by Thibaut Izard",
+				title: "MacOS by Thibaut Izard",
 			},
 		],
 	}),
