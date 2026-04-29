@@ -1,0 +1,10 @@
+pre-push:
+  parallel: true
+  jobs:
+    - name: biome-lint
+      run: bun run lint
+      fail_text: "Biome lint failed — fix the issues above before pushing."
+
+    - name: build
+      run: bun run build
+      fail_text: "Build failed — fix the errors above before pushing."
