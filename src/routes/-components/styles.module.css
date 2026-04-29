@@ -11,6 +11,7 @@
 	--ah: 10px;
 	--aw: 10px;
 
+	/* biome-ignore lint/correctness/noUnknownProperty: CSS Borders 4 (Chrome 139+) */
 	border-shape: shape(
 		from 50px 0,
 		hline to calc(100% - 50px),
