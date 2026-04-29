@@ -41,7 +41,7 @@ function Background() {
 	return (
 		<div
 			className={cn(
-				"w-full h-[250px] absolute top-0",
+				"w-full h-62.5 absolute top-0",
 				"bg-linear-to-b z-0 from-[#00729fa0] via-transparent to-transparent",
 				isDarkMode && "bg-transparent",
 			)}

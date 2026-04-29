@@ -48,8 +48,8 @@ function SoundFull() {
 				<path
 					d="M14.536 8.464a5 5 0 0 1 .027 7.044m4.094-9.165a8 8 0 0 1 .044 11.27"
 					stroke="currentColor"
-					stroke-linecap="round"
-					stroke-width="1"
+					strokeLinecap="round"
+					strokeWidth="1"
 				/>
 			</g>
 		</svg>

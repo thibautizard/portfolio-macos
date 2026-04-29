@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { useCallback, useEffect, useId, useRef } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import "./glass-surface.css";
 
 interface GlassSurfaceProps {
@@ -150,19 +150,22 @@ const GlassSurface = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [updateDisplacementMap]);
 
-	const supportsSVGFilters = () => {
+	const [supportsSVGFilters, setSupportsSVGFilters] = useState(false);
+
+	useEffect(() => {
 		const isWebkit =
 			/Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
 		const isFirefox = /Firefox/.test(navigator.userAgent);
 
 		if (isWebkit || isFirefox) {
-			return false;
+			setSupportsSVGFilters(false);
+			return;
 		}
 
 		const div = document.createElement("div");
 		div.style.backdropFilter = `url(#${filterId})`;
-		return div.style.backdropFilter !== "";
-	};
+		setSupportsSVGFilters(div.style.backdropFilter !== "");
+	}, [filterId]);
 
 	const containerStyle = {
 		...style,
@@ -176,7 +179,7 @@ const GlassSurface = ({
 
 	return (
 		<div
-			className={`glass-surface ${supportsSVGFilters() ? "glass-surface--svg" : "glass-surface--fallback"} ${className}`}
+			className={`glass-surface ${supportsSVGFilters ? "glass-surface--svg" : "glass-surface--fallback"} ${className}`}
 			ref={containerRef}
 			style={containerStyle}
 		>
