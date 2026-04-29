@@ -3,7 +3,7 @@ import { useDarkMode } from "usehooks-ts";
 import { cn } from "@/lib/utils";
 import { Apple } from "./menus/apple";
 import { Battery } from "./menus/battery";
-import { Settings } from "./menus/settings";
+import { Settings } from "./menus/settings/settings";
 import { Time } from "./menus/time";
 export function Header() {
 	return (
