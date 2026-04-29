@@ -68,7 +68,6 @@ export function Slider() {
 					ref={handlerRef}
 					style={{
 						// @ts-expect-error
-
 						cornerShape: "superellipse(1.3)",
 					}}
 				/>

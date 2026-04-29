@@ -15,7 +15,6 @@ export function GlassSquare({ children }: { children: React.ReactNode }) {
 				"border-white/15 border",
 			)}
 			style={{
-				// @ts-expect-error
 				cornerShape: "superellipse(1.5)",
 			}}
 		>

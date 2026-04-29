@@ -22,7 +22,6 @@ export function GlassLong({
 					"border-white/15 border",
 				)}
 				style={{
-					// @ts-expect-error
 					cornerShape: "superellipse(1.5)",
 				}}
 			>
