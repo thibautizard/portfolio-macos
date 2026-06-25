@@ -1,5 +1,5 @@
 import { useLiveDate } from "@/hooks/use-live-date";
-import { formatDateForHeader } from "@/routes/-utils/format-date-for-header";
+import { formatDateForHeader } from "@/lib/format-date-for-header";
 
 export function Time() {
 	const { liveDate } = useLiveDate();
