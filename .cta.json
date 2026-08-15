@@ -1,5 +1,5 @@
 {
-  "projectName": "mac-portfolio",
+  "projectName": "portfolio",
   "mode": "file-router",
   "typescript": true,
   "tailwind": true,

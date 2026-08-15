@@ -3,7 +3,7 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "mac-portfolio",
+      "name": "portfolio",
       "dependencies": {
         "@base-ui-components/react": "^1.0.0-rc.0",
         "@tailwindcss/vite": "^4.3.3",
