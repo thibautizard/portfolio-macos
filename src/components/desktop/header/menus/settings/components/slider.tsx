@@ -67,7 +67,6 @@ export function Slider() {
 					className="w-5 rounded-full h-3.5 bg-white"
 					ref={handlerRef}
 					style={{
-						// @ts-expect-error
 						cornerShape: "superellipse(1.3)",
 					}}
 				/>
