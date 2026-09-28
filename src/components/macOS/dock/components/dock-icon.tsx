@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { cn } from "cn";
 
 export function DockIcon({
@@ -15,11 +15,6 @@ export function DockIcon({
   name?: string;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    if (!name) return;
-    if (!ref.current) return;
-    onHover?.(ref.current, name);
-  }, [name, onHover]);
   return (
     <button
       className={cn(
