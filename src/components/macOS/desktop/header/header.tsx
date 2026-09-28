@@ -1,6 +1,6 @@
-import { useDarkMode } from "usehooks-ts";
 // import { Wifi } from "./menus/wifi";
 import { cn } from "cn";
+import { useDarkMode } from "usehooks-ts";
 import { Apple } from "./menus/apple";
 import { Battery } from "./menus/battery";
 import { Settings } from "./menus/settings/settings";
@@ -12,7 +12,7 @@ export function Header() {
       <div
         className={cn(
           "relative z-1 items-center flex justify-between",
-          "px-3.5 py-2.5 gap-x-5",
+          "px-3.5 py-1 gap-x-5",
           "text-[13.5px] font-medium text-shadow-2xs",
           "select-none",
         )}

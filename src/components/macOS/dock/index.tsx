@@ -1,6 +1,6 @@
+import { cn } from "cn";
 import { useDarkMode } from "usehooks-ts";
 import { Glass } from "@/components/seraui/liquid-glass";
-import { cn } from "cn";
 import { DockIcon } from "./components/dock-icon";
 import { DockSeparator } from "./components/dock-separator";
 import { regularApps, trashApp } from "./dock-types";
@@ -18,7 +18,7 @@ export function Dock() {
 
   const { showTooltip, Tooltip } = useAppTooltip({ isDockResizing });
   return (
-    <div className="fixed flex justify-center w-full bottom-1">
+    <div className="fixed z-99 flex justify-center w-full bottom-1">
       <Tooltip />
       <div
         className={cn("overflow-hidden", "squircle")}
