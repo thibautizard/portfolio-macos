@@ -6,9 +6,9 @@ import "./styles.css";
 const rootElement = document.getElementById("root");
 
 if (rootElement && !rootElement.innerHTML) {
-  ReactDOM.createRoot(rootElement).render(
-    <StrictMode>
-      <Layout />
-    </StrictMode>,
-  );
+	ReactDOM.createRoot(rootElement).render(
+		<StrictMode>
+			<Layout />
+		</StrictMode>,
+	);
 }

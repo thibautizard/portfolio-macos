@@ -10,76 +10,76 @@ import { useResizeDock } from "./hooks/use-resize-dock";
 const INITIAL_DOCK_HEIGHT = 105;
 
 export function Dock() {
-  const { isDarkMode } = useDarkMode();
+	const { isDarkMode } = useDarkMode();
 
-  const { height, resize, isDockResizing } = useResizeDock({
-    initialHeight: INITIAL_DOCK_HEIGHT,
-  });
+	const { height, resize, isDockResizing } = useResizeDock({
+		initialHeight: INITIAL_DOCK_HEIGHT,
+	});
 
-  const { showTooltip, Tooltip } = useAppTooltip({ isDockResizing });
-  return (
-    <div className="fixed z-99 flex justify-center w-full bottom-1">
-      <Tooltip />
-      <div
-        className={cn("overflow-hidden", "squircle")}
-        style={{ height: `${height}px` }}
-      >
-        <Glass className="h-full!">
-          <div
-            className={cn(
-              "h-full border ",
-              "bg-white/20 border-white/20",
-              isDarkMode && "bg-black/10",
-            )}
-          >
-            {/* 🟧🟥🟨 | 🚮 */}
-            <div className="flex items-center h-full gap-x-2 p-1.5 px-2.5">
-              {/* 🟧🟥🟨 */}
-              <RegularApps onHover={showTooltip} />
-              {/* | */}
-              <DockSeparator onMouseDown={resize} />
-              {/* 🚮 */}
-              <TrashApp onHover={showTooltip} />
-            </div>
-          </div>
-        </Glass>
-      </div>
-    </div>
-  );
+	const { showTooltip, Tooltip } = useAppTooltip({ isDockResizing });
+	return (
+		<div className="fixed z-99 flex justify-center w-full bottom-1">
+			<Tooltip />
+			<div
+				className={cn("overflow-hidden", "squircle")}
+				style={{ height: `${height}px` }}
+			>
+				<Glass className="h-full!">
+					<div
+						className={cn(
+							"h-full border ",
+							"bg-white/20 border-white/20",
+							isDarkMode && "bg-black/10",
+						)}
+					>
+						{/* 🟧🟥🟨 | 🚮 */}
+						<div className="flex items-center h-full gap-x-2 p-1.5 px-2.5">
+							{/* 🟧🟥🟨 */}
+							<RegularApps onHover={showTooltip} />
+							{/* | */}
+							<DockSeparator onMouseDown={resize} />
+							{/* 🚮 */}
+							<TrashApp onHover={showTooltip} />
+						</div>
+					</div>
+				</Glass>
+			</div>
+		</div>
+	);
 }
 
 // ----------------------------------------------------------------
 // 🟧🟥🟨
 function RegularApps({
-  onHover,
+	onHover,
 }: {
-  onHover: (el: HTMLElement | null, name: string) => void;
+	onHover: (el: HTMLElement | null, name: string) => void;
 }) {
-  return regularApps.map((app) => (
-    <DockIcon
-      alt={app.name}
-      key={app.id}
-      name={app.name}
-      onHover={onHover}
-      src={app.icon}
-    />
-  ));
+	return regularApps.map((app) => (
+		<DockIcon
+			alt={app.name}
+			key={app.id}
+			name={app.name}
+			onHover={onHover}
+			src={app.icon}
+		/>
+	));
 }
 
 // 🚮
 function TrashApp({
-  onHover,
+	onHover,
 }: {
-  onHover: (el: HTMLElement | null, name: string) => void;
+	onHover: (el: HTMLElement | null, name: string) => void;
 }) {
-  return (
-    <DockIcon
-      alt="Trash"
-      className="py-1.5"
-      key={trashApp.id}
-      name={trashApp.name}
-      onHover={onHover}
-      src={trashApp.icon}
-    />
-  );
+	return (
+		<DockIcon
+			alt="Trash"
+			className="py-1.5"
+			key={trashApp.id}
+			name={trashApp.name}
+			onHover={onHover}
+			src={trashApp.icon}
+		/>
+	);
 }

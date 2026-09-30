@@ -7,23 +7,23 @@ import { Finder } from "../finder";
 import { Header } from "./header/header";
 
 export function Layout() {
-  const { isDarkMode } = useDarkMode();
-  const mainRef = useRef<HTMLElement>(null);
+	const { isDarkMode } = useDarkMode();
+	const mainRef = useRef<HTMLElement>(null);
 
-  return (
-    <div
-      className="w-screen font-sf-pro text-sm text-white flex flex-col h-screen bg-cover bg-center"
-      style={{
-        backgroundImage: `url(${isDarkMode ? wallpaperTahoeDark : wallpaperTahoeLight})`,
-      }}
-    >
-      {/* ⬆️ */}
-      <Header />
-      {/* 🖥️ */}
-      <main className="relative grow" ref={mainRef}>
-        <Dock />
-        <Finder mainRef={mainRef} />
-      </main>
-    </div>
-  );
+	return (
+		<div
+			className="w-screen font-sf-pro text-sm text-white flex flex-col h-screen bg-cover bg-center"
+			style={{
+				backgroundImage: `url(${isDarkMode ? wallpaperTahoeDark : wallpaperTahoeLight})`,
+			}}
+		>
+			{/* ⬆️ */}
+			<Header />
+			{/* 🖥️ */}
+			<main className="relative grow" ref={mainRef}>
+				<Dock />
+				<Finder mainRef={mainRef} />
+			</main>
+		</div>
+	);
 }

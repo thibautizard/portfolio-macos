@@ -11,6 +11,7 @@
     "format:fix": "biome format --fix",
     "lint": "biome lint",
     "check": "biome check",
+    "check:write": "biome check --write",
     "typecheck": "tsc --noEmit",
     "ci": "bun run lint && bun run check && bun run format && bun run typecheck && bun run build"
   },
