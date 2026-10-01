@@ -6,6 +6,7 @@
       "name": "portfolio",
       "dependencies": {
         "@base-ui-components/react": "^1.0.0-rc.0",
+        "@liquid-dom/react": "^0.1.1",
         "@tailwindcss/vite": "^4.3.3",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -102,6 +103,12 @@
     "@jridgewell/sourcemap-codec": ["@jridgewell/sourcemap-codec@1.6.0", "", {}, "sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw=="],
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
+
+    "@liquid-dom/core": ["@liquid-dom/core@0.1.1", "", { "dependencies": { "@liquid-dom/layout": "0.2.0" } }, "sha512-Q+Agxas90pMz+Az3vd/wlNAbxOXBz7dQDDZl2lRCARm6TrqeKYVUoWM+Q/JmlBNoTM8z0tYMkguhmFz75ZiogQ=="],
+
+    "@liquid-dom/layout": ["@liquid-dom/layout@0.2.0", "", {}, "sha512-bdKWF2MVF7qv4+Db0e9JPE4aKXAmIEubFF4bivluFAGNJBZklLr45qggg5D2THy/gqwuuCNP5uxnOJZfi+UaHA=="],
+
+    "@liquid-dom/react": ["@liquid-dom/react@0.1.1", "", { "dependencies": { "@liquid-dom/core": "0.1.1", "@liquid-dom/layout": "0.2.0" }, "peerDependencies": { "react": ">=19", "react-dom": ">=19" } }, "sha512-5ZYEkxj/QqHk8U7gsGMbhrcfbzQ+03UGeasElGjREo30qEcBGJ+tPyoxEr1XR+JwrfXpEFhHuxAuBzrbvHeVbw=="],
 
     "@oxc-project/types": ["@oxc-project/types@0.151.0", "", {}, "sha512-J1yXrIlNDZVzE3ada310xeAw7nH8yCAyLPuUIsjKatFPmfn5bS1oW+cM+QsGOtVWd5nhSpbwZWx/rue+r5Z+PA=="],
 

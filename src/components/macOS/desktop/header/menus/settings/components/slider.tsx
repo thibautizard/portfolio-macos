@@ -1,7 +1,7 @@
 import { cn } from "cn";
 import { motion, useMotionValue, useMotionValueEvent } from "motion/react";
-import { useLayoutEffect, useRef, useState } from "react";
-import { useDarkMode } from "usehooks-ts";
+import { type RefObject, useLayoutEffect, useRef, useState } from "react";
+import { useDarkMode, useResizeObserver } from "usehooks-ts";
 
 export function Slider() {
 	const { isDarkMode } = useDarkMode();
@@ -11,18 +11,19 @@ export function Slider() {
 	const [value, setValue] = useState(100);
 	const x = useMotionValue(0);
 
-	const [sliderWidth, setSliderWidth] = useState(0);
-	const [handlerWidth, setHandlerWidth] = useState(0);
+	// Observed rather than measured once: inside liquid-dom's <Html>, the slider
+	// mounts in a detached host and only gets its real size a frame later.
+	const { width: sliderWidth = 0 } = useResizeObserver({
+		box: "border-box",
+		ref: sliderRef as RefObject<HTMLDivElement>,
+	});
+	const { width: handlerWidth = 0 } = useResizeObserver({
+		box: "border-box",
+		ref: handlerRef as RefObject<HTMLDivElement>,
+	});
 	const maxRight = sliderWidth - handlerWidth;
 
 	useLayoutEffect(() => {
-		if (sliderRef.current) {
-			setSliderWidth(sliderRef.current.offsetWidth);
-		}
-		if (handlerRef.current) {
-			setHandlerWidth(handlerRef.current.offsetWidth);
-		}
-
 		let initialX = (value * sliderWidth) / 100;
 		if (initialX > maxRight) initialX = maxRight;
 		x.set(initialX);
