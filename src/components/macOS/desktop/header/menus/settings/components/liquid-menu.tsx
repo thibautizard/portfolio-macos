@@ -1,13 +1,13 @@
 import {
-  Frame,
-  Glass,
-  GlassContainer,
-  HStack,
-  Html,
-  LiquidCanvas,
-  Padding,
-  VStack,
-  ZStack,
+	Frame,
+	Glass,
+	GlassContainer,
+	HStack,
+	Html,
+	LiquidCanvas,
+	Padding,
+	VStack,
+	ZStack,
 } from "@liquid-dom/react";
 import { cn } from "cn";
 import { useLayoutEffect, useRef, useState } from "react";
@@ -30,105 +30,105 @@ const CANVAS_STYLE = { display: "block", height: "100%", width: "100%" };
 
 /** Settings menu rendered with liquid-dom (WebGPU + HTML-in-Canvas only). */
 export function LiquidMenu({ isOpened }: { isOpened: boolean }) {
-  const hostRef = useRef<HTMLDivElement>(null);
-  const [top, setTop] = useState(0);
+	const hostRef = useRef<HTMLDivElement>(null);
+	const [top, setTop] = useState(0);
 
-  useLayoutEffect(() => {
-    if (hostRef.current) setTop(hostRef.current.getBoundingClientRect().top);
-  }, []);
+	useLayoutEffect(() => {
+		if (hostRef.current) setTop(hostRef.current.getBoundingClientRect().top);
+	}, []);
 
-  return (
-    <div
-      className={cn(
-        "fixed right-0 -z-1",
-        "transition-all duration-300",
-        isOpened
-          ? "opacity-100 scale-100"
-          : "opacity-0 scale-102 pointer-events-none",
-      )}
-      ref={hostRef}
-      style={{ height: HEIGHT, width: WIDTH }}
-    >
-      {/* The canvas needs a CSS size, or it grows by DPR every frame */}
-      <LiquidCanvas
-        canvasStyle={CANVAS_STYLE}
-        style={{ height: "100%", width: "100%" }}
-      >
-        <ZStack>
-          {/* 🖼️ The glass only refracts what's in the canvas */}
-          <Html sizing="fill">
-            <Backdrop top={top} />
-          </Html>
-          {/* 🫧 */}
-          <GlassContainer
-            blur={6}
-            spacing={GAP}
-            tint={{ a: 0.08, b: 1, g: 1, r: 1 }}
-          >
-            <Padding insets={PADDING}>
-              <LiquidGlassProvider value={true}>
-                <VStack spacing={GAP}>
-                  <HStack spacing={GAP}>
-                    <Tile {...SQUARE} cornerRadius={42}>
-                      <MusicPlayer />
-                    </Tile>
-                    <Tile {...SQUARE} cornerRadius={42}>
-                      <MusicPlayer />
-                    </Tile>
-                  </HStack>
-                  <Tile {...LONG} cornerRadius={32}>
-                    <DisplaySlider />
-                  </Tile>
-                  <Tile {...LONG} cornerRadius={32}>
-                    <VolumeSlider />
-                  </Tile>
-                </VStack>
-              </LiquidGlassProvider>
-            </Padding>
-          </GlassContainer>
-        </ZStack>
-      </LiquidCanvas>
-    </div>
-  );
+	return (
+		<div
+			className={cn(
+				"fixed right-0 -z-1",
+				"transition-all duration-300",
+				isOpened
+					? "opacity-100 scale-100"
+					: "opacity-0 scale-102 pointer-events-none",
+			)}
+			ref={hostRef}
+			style={{ height: HEIGHT, width: WIDTH }}
+		>
+			{/* The canvas needs a CSS size, or it grows by DPR every frame */}
+			<LiquidCanvas
+				canvasStyle={CANVAS_STYLE}
+				style={{ height: "100%", width: "100%" }}
+			>
+				<ZStack>
+					{/* 🖼️ The glass only refracts what's in the canvas */}
+					<Html sizing="fill">
+						<Backdrop top={top} />
+					</Html>
+					{/* 🫧 */}
+					<GlassContainer
+						blur={6}
+						spacing={GAP}
+						tint={{ a: 0.08, b: 1, g: 1, r: 1 }}
+					>
+						<Padding insets={PADDING}>
+							<LiquidGlassProvider value={true}>
+								<VStack spacing={GAP}>
+									<HStack spacing={GAP}>
+										<Tile {...SQUARE} cornerRadius={42}>
+											<MusicPlayer />
+										</Tile>
+										<Tile {...SQUARE} cornerRadius={42}>
+											<MusicPlayer />
+										</Tile>
+									</HStack>
+									<Tile {...LONG} cornerRadius={32}>
+										<DisplaySlider />
+									</Tile>
+									<Tile {...LONG} cornerRadius={32}>
+										<VolumeSlider />
+									</Tile>
+								</VStack>
+							</LiquidGlassProvider>
+						</Padding>
+					</GlassContainer>
+				</ZStack>
+			</LiquidCanvas>
+		</div>
+	);
 }
-
 // ----------------------------------------
+// ▭
 function Tile({
-  children,
-  cornerRadius,
-  height,
-  width,
+	children,
+	cornerRadius,
+	height,
+	width,
 }: {
-  children: React.ReactNode;
-  cornerRadius: number;
-  height: number;
-  width: number;
+	children: React.ReactNode;
+	cornerRadius: number;
+	height: number;
+	width: number;
 }) {
-  return (
-    <Frame height={height} width={width}>
-      {/* ≈ CSS corner-shape: superellipse(1.5) (exponent 2^1.5 = 2 + 0.25 × 3.33) */}
-      <Glass cornerRadius={cornerRadius} cornerSmoothing={0.25}>
-        <Html sizing="fill">{children}</Html>
-      </Glass>
-    </Frame>
-  );
+	return (
+		<Frame height={height} width={width}>
+			{/* ≈ CSS corner-shape: superellipse(1.5) (exponent 2^1.5 = 2 + 0.25 × 3.33) */}
+			<Glass cornerRadius={cornerRadius} cornerSmoothing={0.25}>
+				<Html sizing="fill">{children}</Html>
+			</Glass>
+		</Frame>
+	);
 }
 
 // ------------------------------------------------------------------------------
 /** The page wallpaper, cropped to the area behind the menu so it lines up. */
 function Backdrop({ top }: { top: number }) {
-  const { isDarkMode } = useDarkMode();
-  return (
-    <div className="relative size-full overflow-hidden">
-      <div
-        className="absolute right-0 w-screen h-screen bg-cover bg-center"
-        style={{
-          backgroundImage: `url(${isDarkMode ? wallpaperTahoeDark : wallpaperTahoeLight})`,
-          top: -top,
-        }}
-      />
-      {/* ⚫ Same dimming as the CSS menu */}
-      <div className="absolute inset-0 bg-black/40 mask-x-from-50 mask-y-from-50" />
-    </div>
-  );
+	const { isDarkMode } = useDarkMode();
+	return (
+		<div className="relative size-full overflow-hidden">
+			<div
+				className="absolute right-0 w-screen h-screen bg-cover bg-center"
+				style={{
+					backgroundImage: `url(${isDarkMode ? wallpaperTahoeDark : wallpaperTahoeLight})`,
+					top: -top,
+				}}
+			/>
+			{/* ⚫ Same dimming as the CSS menu */}
+			<div className="absolute inset-0 bg-black/10 mask-x-from-50 mask-y-from-50" />
+		</div>
+	);
 }

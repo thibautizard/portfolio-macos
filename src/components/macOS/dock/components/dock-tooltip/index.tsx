@@ -1,19 +1,13 @@
 // import { Glass } from "@/components/seraui/liquid-glass";
 import { cn } from "cn";
+import { useDockContext } from "../../contexts/dock-context";
 import s from "./style.module.css";
-
 // ℹ️
-export function DockTooltip({
-	x,
-	y,
-	width,
-	children,
-}: {
-	x: number;
-	y: number;
-	width: number;
-	children: React.ReactNode;
-}) {
+export function DockTooltip() {
+	const { tooltipData } = useDockContext();
+
+	if (!tooltipData) return;
+	const { x, y, width, name } = tooltipData;
 	return (
 		<div
 			className="fixed z-50 pointer-events-none"
@@ -33,7 +27,7 @@ export function DockTooltip({
 					s.tooltip,
 				)}
 			>
-				<span className={s.tooltipContent}>{children}</span>
+				<span className={s.tooltipContent}>{name}</span>
 			</div>
 			{/*</Glass>*/}
 		</div>

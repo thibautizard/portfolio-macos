@@ -10,6 +10,7 @@ export function DockSeparator({
 	return (
 		<button
 			className="h-full px-2 flex items-center cursor-ns-resize touch-none outline-none bg-transparent border-none"
+			data-dock-separator
 			onMouseDown={onMouseDown}
 			type="button"
 		>

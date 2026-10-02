@@ -21,8 +21,8 @@ export function Layout() {
 			<Header />
 			{/* 🖥️ */}
 			<main className="relative grow" ref={mainRef}>
-				<Dock />
 				<Finder mainRef={mainRef} />
+				<Dock />
 			</main>
 		</div>
 	);

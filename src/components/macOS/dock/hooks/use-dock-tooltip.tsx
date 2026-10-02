@@ -1,6 +1,10 @@
-import { useCallback, useState } from "react";
-import { DockTooltip } from "../components/dock-tooltip/dock-tooltip";
-export function useAppTooltip({ isDockResizing }: { isDockResizing: boolean }) {
+import { useState } from "react";
+
+export function useDockTooltip({
+	isDockResizing,
+}: {
+	isDockResizing: boolean;
+}) {
 	const [tooltipData, setTooltipData] = useState<{
 		name: string;
 		x: number;
@@ -27,14 +31,5 @@ export function useAppTooltip({ isDockResizing }: { isDockResizing: boolean }) {
 		});
 	};
 
-	// 💬
-	const Tooltip = useCallback(
-		() =>
-			tooltipData ? (
-				<DockTooltip {...tooltipData}>{tooltipData.name}</DockTooltip>
-			) : null,
-		[tooltipData],
-	);
-
-	return { showTooltip, Tooltip };
+	return { showTooltip, tooltipData };
 }

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 // ---------------------------------------------------------------
 // ↕️ Dock resize
-export function useResizeDock({ initialHeight }: { initialHeight: number }) {
+export function useDockResize({ initialHeight }: { initialHeight: number }) {
 	const [height, setHeight] = useState(initialHeight);
 	const [isDockResizing, setisDockResizing] = useState(false);
 	const startYRef = useRef<number>(0);
@@ -17,7 +17,6 @@ export function useResizeDock({ initialHeight }: { initialHeight: number }) {
 
 	useEffect(() => {
 		if (!isDockResizing) return;
-
 		document.body.style.cursor = "ns-resize";
 
 		const handleMouseMove = (e: MouseEvent) => {
@@ -29,18 +28,23 @@ export function useResizeDock({ initialHeight }: { initialHeight: number }) {
 			setHeight(newHeight);
 		};
 
+		const controller = new AbortController();
+		const { signal } = controller;
+
 		const handleMouseUp = () => {
 			setisDockResizing(false);
 		};
 
-		window.addEventListener("mousemove", handleMouseMove);
-		window.addEventListener("mouseup", handleMouseUp);
+		window.addEventListener("mousemove", handleMouseMove, {
+			signal,
+		});
+		window.addEventListener("mouseup", handleMouseUp, { signal });
 
-		return () => {
-			window.removeEventListener("mousemove", handleMouseMove);
-			window.removeEventListener("mouseup", handleMouseUp);
+		const cleanUp = () => {
+			controller.abort();
 			document.body.style.cursor = "";
 		};
+		return cleanUp;
 	}, [isDockResizing]);
 
 	return { height, isDockResizing, resize };

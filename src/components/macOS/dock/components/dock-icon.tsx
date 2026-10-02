@@ -19,6 +19,7 @@ export function DockIcon({
 		<button
 			className={cn(
 				"group",
+				"shrink-0",
 				"h-full relative bg-transparent border-none p-0 cursor-default",
 				"focus-within:outline-none",
 				className,
