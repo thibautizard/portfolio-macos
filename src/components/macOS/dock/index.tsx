@@ -8,64 +8,64 @@ import { DockContextProvider, useDockContext } from "./contexts/dock-context";
 import { regularApps, trashApp } from "./types/dock-types";
 
 export function Dock() {
-  const Dock = supportsLiquidGlass ? LiquidDock : FallbackDock;
-  return (
-    <DockContextProvider>
-      <Container>
-        <DockTooltip />
-        <Dock>
-          <Apps />
-        </Dock>
-      </Container>
-    </DockContextProvider>
-  );
+	const Dock = supportsLiquidGlass ? LiquidDock : FallbackDock;
+	return (
+		<DockContextProvider>
+			<Container>
+				<DockTooltip />
+				<Dock>
+					<Apps />
+				</Dock>
+			</Container>
+		</DockContextProvider>
+	);
 }
 
 // 📦
 function Container({ children }: { children: React.ReactNode }) {
-  const centerFixedBottom = "relative mx-auto mb-1.5 w-max";
-  return <div className={centerFixedBottom}>{children}</div>;
+	const centerFixedBottom = "relative mx-auto mb-1.5 w-max";
+	return <div className={centerFixedBottom}>{children}</div>;
 }
 
 // ----------------------------------------------------------------
 // 🟧🟥🟨
 
 function Apps() {
-  const { resize, showTooltip } = useDockContext();
-  const flexCentered = "flex items-center h-full gap-x-2 p-1.5 px-2.5";
-  return (
-    <div className={flexCentered}>
-      <RegularApps onHover={showTooltip} />
-      <DockSeparator onMouseDown={resize} />
-      <TrashApp onHover={showTooltip} />
-    </div>
-  );
+	const { resize, showTooltip } = useDockContext();
+	const flexCentered = "flex items-center h-full gap-x-2 p-1.5 px-2.5";
+	return (
+		<div className={flexCentered}>
+			<RegularApps onHover={showTooltip} />
+			<DockSeparator onMouseDown={resize} />
+			<TrashApp onHover={showTooltip} />
+		</div>
+	);
 }
 function RegularApps({
-  onHover,
+	onHover,
 }: {
-  onHover: (el: HTMLElement | null, name: string) => void;
+	onHover: (el: HTMLElement | null, name: string) => void;
 }) {
-  return regularApps.map(({ id, name, icon }) => (
-    <DockIcon alt={name} key={id} name={name} onHover={onHover} src={icon} />
-  ));
+	return regularApps.map(({ id, name, icon }) => (
+		<DockIcon alt={name} key={id} name={name} onHover={onHover} src={icon} />
+	));
 }
 
 // 🚮
 function TrashApp({
-  onHover,
+	onHover,
 }: {
-  onHover: (el: HTMLElement | null, name: string) => void;
+	onHover: (el: HTMLElement | null, name: string) => void;
 }) {
-  const { id, name, icon } = trashApp;
-  return (
-    <DockIcon
-      alt="Trash"
-      className="py-1.5"
-      key={id}
-      name={name}
-      onHover={onHover}
-      src={icon}
-    />
-  );
+	const { id, name, icon } = trashApp;
+	return (
+		<DockIcon
+			alt="Trash"
+			className="py-1.5"
+			key={id}
+			name={name}
+			onHover={onHover}
+			src={icon}
+		/>
+	);
 }
