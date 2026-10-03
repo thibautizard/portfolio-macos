@@ -4,46 +4,45 @@ import { type RefObject, useState } from "react";
 import { Sidebar } from "./components/sidebar";
 
 export function Finder({
-	mainRef,
+  parentRef,
 }: {
-	mainRef: RefObject<HTMLElement | null>;
+  parentRef: RefObject<HTMLDivElement | null>;
 }) {
-	const [isOpen /*  , setIsOpen */] = useState(true);
-	return (
-		<Window isOpen={isOpen} mainRef={mainRef}>
-			<Sidebar />
-		</Window>
-	);
+  const [isOpen /*  , setIsOpen */] = useState(true);
+  return (
+    <Window isOpen={isOpen} parentRef={parentRef}>
+      <Sidebar />
+    </Window>
+  );
 }
 
 // 📦
 export function Window({
-	children,
-	isOpen,
-	mainRef,
+  children,
+  isOpen,
+  parentRef,
 }: {
-	children: React.ReactNode;
-	isOpen: boolean;
-	mainRef: RefObject<HTMLElement | null>;
+  children: React.ReactNode;
+  isOpen: boolean;
+  parentRef: RefObject<HTMLDivElement | null>;
 }) {
-	return (
-		<motion.div
-			className={cn(
-				isOpen ? "flex" : "hidden",
-				"absolute top-[45%] left-[50%] -translate-x-1/2 -translate-y-1/2",
-				"h-200 w-300",
-				"p-1.5",
-				"rounded-3xl",
-				"bg-[#1F212D]",
-				"border-[#4D5057] border",
-				"shadow-2xl",
-			)}
-			drag
-			dragConstraints={mainRef}
-			dragElastic={0}
-			dragMomentum={false}
-		>
-			{children}
-		</motion.div>
-	);
+  return (
+    <motion.div
+      className={cn(
+        isOpen ? "flex" : "hidden",
+        "h-200 w-300",
+        "p-1.5",
+        "rounded-3xl",
+        "bg-[#1F212D]",
+        "border-[#4D5057] border",
+        "shadow-2xl",
+      )}
+      drag
+      dragConstraints={parentRef}
+      dragElastic={0}
+      dragMomentum={false}
+    >
+      {children}
+    </motion.div>
+  );
 }
