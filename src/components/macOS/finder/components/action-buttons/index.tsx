@@ -1,5 +1,6 @@
 import { cn } from "cn";
-
+import { useAppDispatch } from "@/store/hooks";
+import { closeFinder } from "@/store/slices/app-slice";
 export function ActionButtons() {
 	return (
 		<div className="group flex gap-x-2 mb-4">
@@ -14,12 +15,13 @@ export function ActionButtons() {
 function CloseButton() {
 	const accentColor = "#992128";
 	const backgroundColor = "#FF5C5F";
+	const dispatch = useAppDispatch();
 	return (
 		<TopButton
 			accentColor={accentColor}
 			backgroundColor={backgroundColor}
 			Icon={<CloseIcon color={accentColor} />}
-			onClick={() => {}}
+			onClick={() => dispatch(closeFinder())}
 		/>
 	);
 }
