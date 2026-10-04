@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/a11y/noStaticElementInteractions: exception */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: keyboard reaches the real buttons directly, only pointer clicks hit the canvas */
 import {
 	Glass,
 	GlassContainer,
@@ -21,12 +22,14 @@ import { useDockContext } from "../../contexts/dock-context";
 const CORNER_RADIUS = 25;
 const CORNER_SMOOTHING = 0.6;
 const CANVAS_STYLE = { display: "block", height: "100%", width: "100%" };
+const ICON_SELECTOR = "button:not([data-dock-separator])";
 
 /** Dock rendered with liquid-dom (WebGPU + HTML-in-Canvas only). */
 export function LiquidDock({ children }: { children: React.ReactNode }) {
 	const { isDarkMode } = useDarkMode();
 	const { height, resize } = useDockContext();
 	const hostRef = useRef<HTMLDivElement>(null);
+	const hoveredRef = useRef<HTMLElement>(undefined);
 
 	const [width, setWidth] = useState(0);
 	const [offset, setOffset] = useState({ left: 0, top: 0 });
@@ -62,9 +65,14 @@ export function LiquidDock({ children }: { children: React.ReactNode }) {
 
 	return (
 		<Container
+			onClick={forwardClick}
 			onMouseDown={(e) => isOverSeparator(e) && resize(e)}
+			onMouseLeave={() => {
+				hoveredRef.current = undefined;
+			}}
 			onMouseMove={(e) => {
 				e.currentTarget.style.cursor = isOverSeparator(e) ? "ns-resize" : "";
+				forwardHover(e, hoveredRef);
 			}}
 			ref={hostRef}
 			width={width}
@@ -107,12 +115,16 @@ export function Container({
 	children,
 	ref,
 	width,
+	onClick,
 	onMouseDown,
+	onMouseLeave,
 	onMouseMove,
 }: {
 	children: React.ReactNode;
 	ref: RefObject<HTMLDivElement | null>;
 	width: number;
+	onClick: React.MouseEventHandler<HTMLDivElement>;
+	onMouseLeave: React.MouseEventHandler<HTMLDivElement>;
 	onMouseDown: React.MouseEventHandler<HTMLDivElement>;
 	onMouseMove: React.MouseEventHandler<HTMLDivElement>;
 }) {
@@ -120,7 +132,9 @@ export function Container({
 	return (
 		<div
 			className="overflow-hidden rounded-[11px]"
+			onClick={onClick}
 			onMouseDown={onMouseDown}
+			onMouseLeave={onMouseLeave}
 			onMouseMove={onMouseMove}
 			ref={ref}
 			style={{
@@ -134,17 +148,50 @@ export function Container({
 }
 
 // ------------------------------------------------------------------------------
-// ↕️ The canvas receives the mouse events, not the HTML drawn inside it:
-// hit-test the separator by hand
+// 🎯 The canvas receives the mouse events, not the HTML drawn inside it:
+// hit-test its children by hand
+function elementAt(e: React.MouseEvent<HTMLElement>, selector: string) {
+	const elements = e.currentTarget.querySelectorAll<HTMLElement>(selector);
+	return Array.from(elements).find((el) => {
+		const { left, right, top, bottom } = el.getBoundingClientRect();
+		return (
+			e.clientX >= left &&
+			e.clientX <= right &&
+			e.clientY >= top &&
+			e.clientY <= bottom
+		);
+	});
+}
+
+// ↕️
 function isOverSeparator(e: React.MouseEvent<HTMLElement>) {
-	const separator = e.currentTarget.querySelector("[data-dock-separator]");
-	if (!separator) return false;
-	const { left, right, top, bottom } = separator.getBoundingClientRect();
-	return (
-		e.clientX >= left &&
-		e.clientX <= right &&
-		e.clientY >= top &&
-		e.clientY <= bottom
+	return elementAt(e, "[data-dock-separator]") !== undefined;
+}
+
+// 🖱️ Re-dispatch the click on the icon under the pointer
+// (only when it hit the canvas, so the forwarded click doesn't loop back here)
+function forwardClick(e: React.MouseEvent<HTMLElement>) {
+	if (!(e.target instanceof HTMLCanvasElement)) return;
+	elementAt(e, ICON_SELECTOR)?.click();
+}
+
+// 🫳 Re-dispatch a mouseover when the pointer reaches a new icon
+// (React derives onMouseEnter from mouseover + relatedTarget)
+function forwardHover(
+	e: React.MouseEvent<HTMLElement>,
+	hoveredRef: RefObject<HTMLElement | undefined>,
+) {
+	const icon = elementAt(e, ICON_SELECTOR);
+	if (icon === hoveredRef.current) return;
+	const previous = hoveredRef.current ?? e.target;
+	hoveredRef.current = icon;
+	icon?.dispatchEvent(
+		new MouseEvent("mouseover", {
+			bubbles: true,
+			clientX: e.clientX,
+			clientY: e.clientY,
+			relatedTarget: previous,
+		}),
 	);
 }
 
