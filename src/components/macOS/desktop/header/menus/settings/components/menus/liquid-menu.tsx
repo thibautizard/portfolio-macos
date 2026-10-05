@@ -23,7 +23,7 @@ import { VolumeSlider } from "../volume-slider";
 const GAP = 16;
 const PADDING = 24;
 const SQUARE = { height: 138, width: 140 };
-const LONG = { height: 72, width: SQUARE.width * 2 + GAP };
+const LONG = { height: 64, width: SQUARE.width * 2 + GAP };
 const WIDTH = LONG.width + PADDING * 2;
 const HEIGHT = SQUARE.height + LONG.height * 2 + GAP * 2 + PADDING * 2;
 const CANVAS_STYLE = { display: "block", height: "100%", width: "100%" };
@@ -103,10 +103,10 @@ export function LiquidMenu({ isOpened }: { isOpened: boolean }) {
                       <MusicPlayer />
                     </Tile>
                   </HStack>
-                  <Tile {...LONG} cornerRadius={32}>
+                  <Tile {...LONG} cornerRadius={29}>
                     <DisplaySlider />
                   </Tile>
-                  <Tile {...LONG} cornerRadius={32}>
+                  <Tile {...LONG} cornerRadius={29}>
                     <VolumeSlider />
                   </Tile>
                 </VStack>
