@@ -32,6 +32,7 @@ const CANVAS_STYLE = { display: "block", height: "100%", width: "100%" };
 export function LiquidMenu({ isOpened }: { isOpened: boolean }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [offset, setOffset] = useState({ left: 0, top: 0 });
+  const { isDarkMode } = useDarkMode();
 
   // 📍 Where the menu sits on screen, to line the backdrop up with the wallpaper.
   useLayoutEffect(() => {
@@ -85,7 +86,11 @@ export function LiquidMenu({ isOpened }: { isOpened: boolean }) {
           <GlassContainer
             blur={6}
             spacing={GAP}
-            tint={{ a: 0.08, b: 1, g: 1, r: 1 }}
+            tint={
+              isDarkMode
+                ? { a: 0.2, b: 0.3, g: 0.3, r: 0.3 }
+                : { a: 0.4, b: 0.3, g: 0.3, r: 0.3 }
+            }
           >
             <Padding insets={PADDING}>
               <LiquidGlassProvider value={true}>
