@@ -8,6 +8,7 @@ import { FallbackDock } from "./components/docks/fallback-dock";
 import { LiquidDock } from "./components/docks/liquid-dock";
 import { DockContextProvider, useDockContext } from "./contexts/dock-context";
 import { regularApps, trashApp } from "./types/dock-types";
+
 export function Dock() {
   const Dock = supportsLiquidGlass ? LiquidDock : FallbackDock;
   return (
@@ -33,7 +34,7 @@ function Container({ children }: { children: React.ReactNode }) {
 
 function Apps() {
   const { resize, showTooltip } = useDockContext();
-  const flexCentered = "flex items-center h-full gap-x-2 p-1.5 px-2.5";
+  const flexCentered = "flex items-center h-full gap-x-0 p-1.5 px-2.5";
   return (
     <div className={flexCentered}>
       <FinderApp onHover={showTooltip} />

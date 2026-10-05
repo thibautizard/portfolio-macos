@@ -128,7 +128,6 @@ function Tile({
 }) {
   return (
     <Frame height={height} width={width}>
-      {/* ≈ CSS corner-shape: superellipse(1.5) (exponent 2^1.5 = 2 + 0.25 × 3.33) */}
       <Glass cornerRadius={cornerRadius} cornerSmoothing={0.25}>
         <Html sizing="fill">{children}</Html>
       </Glass>
