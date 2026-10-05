@@ -1,6 +1,6 @@
 import { supportsLiquidGlass } from "@/components/macOS/desktop/header/menus/settings/components/liquid-glass";
-import { useAppDispatch } from "@/store/hooks";
-import { openFinder } from "@/store/slices/app-slice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { openFinder, selectIsFinderOpen } from "@/store/slices/app-slice";
 import { DockIcon } from "./components/dock-icon";
 import { DockSeparator } from "./components/dock-separator";
 import { DockTooltip } from "./components/dock-tooltip";
@@ -34,7 +34,7 @@ function Container({ children }: { children: React.ReactNode }) {
 
 function Apps() {
   const { resize, showTooltip } = useDockContext();
-  const flexCentered = "flex items-center h-full gap-x-0 p-1.5 px-2.5";
+  const flexCentered = "flex items-center h-full gap-x-0 py-2 px-2.5";
   return (
     <div className={flexCentered}>
       <FinderApp onHover={showTooltip} />
@@ -63,6 +63,7 @@ function FinderApp({
   onHover: (el: HTMLElement | null, name: string) => void;
 }) {
   const dispatch = useAppDispatch();
+  const isOpen = useAppSelector(selectIsFinderOpen);
 
   const finderApp = regularApps.find((app) => app.id === "finder");
   if (!finderApp) return null;
@@ -71,6 +72,7 @@ function FinderApp({
   return (
     <DockIcon
       alt={name}
+      isActive={isOpen}
       key={id}
       name={name}
       onClick={() => dispatch(openFinder())}

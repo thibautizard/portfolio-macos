@@ -5,6 +5,7 @@ export function DockIcon({
   src,
   alt,
   className,
+  isActive = false,
   onHover,
   onClick,
   name,
@@ -15,6 +16,7 @@ export function DockIcon({
   onHover?: (el: HTMLElement | null, name: string) => void;
   onClick?: () => void;
   name?: string;
+  isActive?: boolean;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
   return (
@@ -35,7 +37,7 @@ export function DockIcon({
       {/* 🟥 */}
       <AppIcon alt={alt} src={src} />
       {/* ⚪ */}
-      <DotBottom active={false} />
+      <DotBottom active={isActive} />
     </button>
   );
 }
@@ -43,7 +45,12 @@ export function DockIcon({
 // 🟥
 function AppIcon({ alt, src }: { alt: string; src: string }) {
   return (
-    <img alt={alt} className="h-full group-active:brightness-50 " src={src} />
+    <img
+      alt={alt}
+      // data-pressed: set by the liquid dock, whose canvas swallows :active
+      className="h-full group-active:brightness-50 group-data-pressed:brightness-50"
+      src={src}
+    />
   );
 }
 
@@ -52,12 +59,12 @@ function DotBottom({ active }: { active: boolean }) {
   return (
     <div
       className={cn(
-        "absolute -bottom-0.5",
+        "absolute -bottom-[3px]",
         "size-1",
         "rounded-full",
         "left-1/2 -translate-x-1/2",
         "bg-transparent",
-        active && "bg-white/50",
+        active && "bg-black",
       )}
     />
   );

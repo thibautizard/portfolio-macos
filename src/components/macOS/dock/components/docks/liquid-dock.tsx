@@ -76,7 +76,10 @@ export function LiquidDock({ children }: { children: React.ReactNode }) {
   return (
     <Container
       onClick={forwardClick}
-      onMouseDown={(e) => isOverSeparator(e) && resize(e)}
+      onMouseDown={(e) => {
+        if (isOverSeparator(e)) resize(e);
+        else forwardPress(e);
+      }}
       onMouseLeave={() => {
         hoveredRef.current = undefined;
       }}
@@ -185,6 +188,17 @@ function isOverSeparator(e: React.MouseEvent<HTMLElement>) {
 function forwardClick(e: React.MouseEvent<HTMLElement>) {
   if (!(e.target instanceof HTMLCanvasElement)) return;
   elementAt(e, ICON_SELECTOR)?.click();
+}
+
+// 👇 :active never reaches the icon under the canvas: flag it as pressed
+// until the button is released (anywhere, like a native press)
+function forwardPress(e: React.MouseEvent<HTMLElement>) {
+  const icon = elementAt(e, ICON_SELECTOR);
+  if (!icon) return;
+  icon.dataset.pressed = "";
+  window.addEventListener("mouseup", () => delete icon.dataset.pressed, {
+    once: true,
+  });
 }
 
 // 🫳 Re-dispatch a mouseover when the pointer reaches a new icon
