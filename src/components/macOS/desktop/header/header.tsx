@@ -10,7 +10,7 @@ export function Header() {
       <div
         className={cn(
           "relative z-1 items-center flex justify-between",
-          "px-3.5 py-1 gap-x-5",
+          "px-3.5 py-3 gap-x-5",
           "text-[13.5px] font-medium text-shadow-2xs",
           "select-none",
         )}

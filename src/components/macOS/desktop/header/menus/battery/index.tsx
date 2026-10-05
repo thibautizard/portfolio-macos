@@ -1,5 +1,4 @@
 import { cn } from "cn";
-import { useEffect, useState } from "react";
 import { useDarkMode } from "usehooks-ts";
 import {
   Menu,
@@ -10,14 +9,13 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from "../menu";
+import { useBattery } from "./hooks/use-battery";
 
 export function Battery() {
   return (
     <Menu>
       <MenuTrigger>
-        <div className="size-6">
-          <BatteryIcon />
-        </div>
+        <BatteryIcon />
       </MenuTrigger>
       <MenuPopup>
         <MenuContent />
@@ -90,78 +88,34 @@ function MenuContent() {
 // ----------------------------------------------------------------
 // 🔋 Battery
 
-function BatteryIcon({
-  value = undefined,
-  strokeWidthLight = 7,
-  strokeWidthBattery = 19,
-  color = "white",
-}: {
-  value?: number;
-  strokeWidthLight?: number;
-  strokeWidthBattery?: number;
-  color?: string;
-}) {
+function BatteryIcon() {
   const { battery, batteryCharging, batteryLevel } = useBattery();
   if (!battery) return null;
-
-  const baseWidthFull = 278;
-  const fillWidth = baseWidthFull * (value ?? batteryLevel ?? 1);
-
-  // ⚡
-  const Lightning = (
-    <svg
-      className="absolute z-10 top-1/2 left-[48%] -translate-x-1/2 -translate-y-1/2 size-[14px]"
-      fill="none"
-      height="108"
-      viewBox="0 0 76 108"
-      width="76"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <title>Lightning</title>
-      <path
-        d="M59.2785 2.44485C59.9191 2.81362 60.4148 3.38723 60.6847 4.07195C60.9545 4.75667 60.9826 5.51203 60.7643 6.21463L48.9763 44.2505H70.7261C71.3653 44.2502 71.9905 44.4358 72.5247 44.7844C73.0588 45.133 73.4785 45.6293 73.7319 46.212C73.9853 46.7947 74.0612 47.4384 73.9505 48.0635C73.8397 48.6886 73.547 49.2678 73.1085 49.7297L20.7468 104.977C20.2402 105.512 19.566 105.86 18.8341 105.966C18.1023 106.072 17.3559 105.928 16.7167 105.559C16.0775 105.19 15.5832 104.616 15.3142 103.932C15.0453 103.248 15.0176 102.493 15.2357 101.792L27.0237 63.7494H5.27392C4.63474 63.7496 4.00949 63.564 3.47533 63.2154C2.94117 62.8668 2.5215 62.3705 2.26812 61.7878C2.01475 61.2051 1.93875 60.5615 2.04952 59.9363C2.1603 59.3112 2.45298 58.732 2.89146 58.2702L55.2532 3.02331C55.7592 2.48904 56.4324 2.14046 57.1632 2.03425C57.894 1.92805 58.6395 2.07047 59.2785 2.43835V2.44485Z"
-        fill={color}
-        stroke="#2D84B1"
-        strokeWidth={strokeWidthLight}
-      />
-    </svg>
-  );
-
-  // 🔋
-  const BaseBatteryIcon = (
-    <svg
-      className="aspect-square w-full h-full"
-      fill="none"
-      height="175"
-      viewBox="0 0 367 175"
-      width="367"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <title>Battery</title>
-      <rect fill={color} height="120" rx="23" width={fillWidth} x="31" y="28" />
-      <rect
-        height="159"
-        rx="35"
-        stroke={color}
-        strokeOpacity={0.5}
-        strokeWidth={strokeWidthBattery}
-        width="323"
-        x="8"
-        y="8"
-      />
-      <path
-        d="M347 115.439V58C358 58 366.5 75.6902 366.5 87.5C366.5 98.773 359.5 115.439 347 115.439Z"
-        fill={color}
-        fillOpacity={0.5}
-      />
-    </svg>
-  );
+  if (batteryCharging) return null;
 
   return (
-    <>
-      {batteryCharging ? Lightning : null}
-      {BaseBatteryIcon}
-    </>
+    <div className="size-6.5 h-fit">
+      <svg
+        version="1.1"
+        viewBox="0 0 28.901 13.2239"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <title>battery</title>
+        <g>
+          <rect height="13.2239" opacity="0" width="28.901" x="0" y="0" />
+          <path
+            d="M5.20687 13.2199L20.5548 13.2199C22.2235 13.2199 23.6198 13.0596 24.622 12.0698C25.6118 11.0676 25.7596 9.67552 25.7596 8.013L25.7596 5.20687C25.7596 3.54434 25.6118 2.15012 24.622 1.16038C23.6177 0.160283 22.2235 0 20.5548 0L5.18577 0C3.55067 0 2.14188 0.162393 1.14179 1.16249C0.149932 2.15434 0 3.54856 0 5.18366L0 8.013C0 9.67552 0.147822 11.0697 1.13968 12.0698C2.14188 13.0596 3.5361 13.2199 5.20687 13.2199ZM4.93695 11.6513C3.93656 11.6513 2.87758 11.5096 2.2877 10.9197C1.69781 10.3298 1.57069 9.28542 1.57069 8.28292L1.57069 4.9684C1.57069 3.93867 1.69781 2.89828 2.28559 2.29805C2.87547 1.70605 3.94078 1.57893 4.9684 1.57893L20.8248 1.57893C21.8251 1.57893 22.882 1.71027 23.4719 2.30016C24.0618 2.90039 24.191 3.93445 24.191 4.9473L24.191 8.28292C24.191 9.28542 24.0597 10.3298 23.4719 10.9197C22.882 11.5117 21.8251 11.6513 20.8248 11.6513ZM27.0951 9.13599C27.8652 9.08826 28.901 8.10022 28.901 6.60993C28.901 5.11964 27.8652 4.13161 27.0951 4.08388Z"
+            fill="white"
+            fill-opacity="0.5"
+          />
+          <path
+            d="M4.42152 10.5103L21.3381 10.5103C22.0172 10.5103 22.4089 10.4123 22.6691 10.1397C22.9417 9.86495 23.0521 9.47324 23.0521 8.80869L23.0521 4.41117C23.0521 3.74241 22.9417 3.35492 22.6815 3.08018C22.4089 2.80965 22.0026 2.71992 21.3381 2.71992L4.44262 2.71992C3.75698 2.71992 3.34859 2.80754 3.08842 3.07807C2.8179 3.35281 2.70957 3.74874 2.70957 4.44262L2.70957 8.80869C2.70957 9.47746 2.8179 9.86495 3.08842 10.1397C3.36316 10.4102 3.75909 10.5103 4.42152 10.5103Z"
+            fill="white"
+            fill-opacity="1"
+          />
+        </g>
+      </svg>
+    </div>
   );
 }
 
@@ -208,53 +162,4 @@ function BatteryForPowerMode() {
       />
     </svg>
   );
-}
-
-function useBattery() {
-  const [battery, setBattery] = useState<BatteryManager | null>(null);
-  const [batteryLevel, setBatteryLevel] = useState(1);
-  const [batteryCharging, setBatteryCharging] = useState(false);
-
-  useEffect(() => {
-    const nav = navigator as NavigatorWithBattery;
-    if (!nav.getBattery) return;
-
-    nav.getBattery().then((bat) => {
-      setBattery(bat);
-      setBatteryLevel(bat.level);
-      setBatteryCharging(bat.charging);
-
-      const handleLevelChange = () => setBatteryLevel(bat.level);
-      const handleChargingChange = () => setBatteryCharging(bat.charging);
-
-      bat.addEventListener("levelchange", handleLevelChange);
-      bat.addEventListener("chargingchange", handleChargingChange);
-
-      // Cleanup listeners when component unmounts or battery changes (though battery instance is stable usually)
-      // We can attach cleanup to the return of this effect, but we need to keep reference to 'bat'
-      return () => {
-        bat.removeEventListener("levelchange", handleLevelChange);
-        bat.removeEventListener("chargingchange", handleChargingChange);
-      };
-    });
-  }, []);
-
-  return { battery, batteryCharging, batteryLevel };
-}
-
-interface BatteryManager extends EventTarget {
-  charging: boolean;
-  level: number;
-  addEventListener(
-    type: "chargingchange" | "levelchange",
-    listener: (this: BatteryManager, ev: Event) => void,
-  ): void;
-  removeEventListener(
-    type: "chargingchange" | "levelchange",
-    listener: (this: BatteryManager, ev: Event) => void,
-  ): void;
-}
-
-interface NavigatorWithBattery extends Navigator {
-  getBattery?: () => Promise<BatteryManager>;
 }
