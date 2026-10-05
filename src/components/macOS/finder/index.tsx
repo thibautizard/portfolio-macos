@@ -1,9 +1,10 @@
 import { cn } from "cn";
 import { motion } from "motion/react";
-import type { RefObject } from "react";
+import { type RefObject, useEffect, useRef } from "react";
 import { useAppSelector } from "@/store/hooks";
 import { selectIsFinderOpen } from "@/store/slices/app-slice";
 import { Sidebar } from "./components/sidebar";
+import { registerWindow, WINDOW_CLASSNAME } from "./window-registry";
 
 export function Finder({
 	parentRef,
@@ -28,21 +29,24 @@ export function Window({
 	isOpen: boolean;
 	parentRef: RefObject<HTMLDivElement | null>;
 }) {
+	const ref = useRef<HTMLDivElement>(null);
+	useEffect(() => {
+		if (ref.current) return registerWindow(ref.current);
+	}, []);
+
 	return (
 		<motion.div
 			className={cn(
 				isOpen ? "flex" : "hidden",
 				"h-200 w-300",
 				"p-1.5",
-				"rounded-3xl",
-				"bg-[#1F212D]",
-				"border-[#4D5057] border",
-				"shadow-2xl",
+				WINDOW_CLASSNAME,
 			)}
 			drag
 			dragConstraints={parentRef}
 			dragElastic={0}
 			dragMomentum={false}
+			ref={ref}
 		>
 			{children}
 		</motion.div>

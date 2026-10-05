@@ -14,6 +14,10 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useDarkMode } from "usehooks-ts";
 import wallpaperTahoeDark from "@/assets/macOS/wallpapers/wallpaper_tahoe_dark.avif";
 import wallpaperTahoeLight from "@/assets/macOS/wallpapers/wallpaper_tahoe_light.avif";
+import {
+  useWindows,
+  WINDOW_CLASSNAME,
+} from "@/components/macOS/finder/window-registry";
 import { DisplaySlider } from "../display-slider";
 import { LiquidGlassProvider } from "../liquid-glass";
 import { MusicPlayer } from "../music-player";
@@ -80,7 +84,7 @@ export function LiquidMenu({ isOpened }: { isOpened: boolean }) {
         <ZStack>
           {/* 🖼️ The glass only refracts what's in the canvas */}
           <Html sizing="fill">
-            <Backdrop {...offset} />
+            <Backdrop {...offset} isOpened={isOpened} />
           </Html>
           {/* 🫧 */}
           <GlassContainer
@@ -142,8 +146,17 @@ function Tile({
 
 // ------------------------------------------------------------------------------
 /** The page wallpaper, cropped to the area behind the menu so it lines up. */
-function Backdrop({ left, top }: { left: number; top: number }) {
+function Backdrop({
+  isOpened,
+  left,
+  top,
+}: {
+  isOpened: boolean;
+  left: number;
+  top: number;
+}) {
   const { isDarkMode } = useDarkMode();
+  const windows = useWindows();
   return (
     <div className="relative size-full overflow-hidden">
       <div
@@ -153,9 +166,60 @@ function Backdrop({ left, top }: { left: number; top: number }) {
           left: -left,
           top: -top,
         }}
-      />
+      >
+        {/* 🪟 The canvas can't see the DOM behind it, so windows are mirrored */}
+        {windows.map((window, index) => (
+          <WindowProxy
+            isOpened={isOpened}
+            // biome-ignore lint/suspicious/noArrayIndexKey: windows have no id yet
+            key={index}
+            window={window}
+          />
+        ))}
+      </div>
       {/* ⚫ Same dimming as the CSS menu */}
       <div className="absolute inset-0 bg-black/10 mask-x-from-50 mask-y-from-50" />
     </div>
+  );
+}
+
+/** A copy of a window's surface that follows it on screen, frame by frame. */
+function WindowProxy({
+  isOpened,
+  window,
+}: {
+  isOpened: boolean;
+  window: HTMLElement;
+}) {
+  const proxyRef = useRef<HTMLDivElement>(null);
+
+  // 🔁 Write styles directly: re-rendering React on every drag frame is wasteful
+  useEffect(() => {
+    const proxy = proxyRef.current;
+    if (!proxy || !isOpened) return;
+    let previous = "";
+    let frame = requestAnimationFrame(function sync() {
+      const { height, left, top, width } = window.getBoundingClientRect();
+      const next = `${left},${top},${width},${height}`;
+      // Only touch the DOM on change, every mutation repaints the canvas
+      if (next !== previous) {
+        previous = next;
+        Object.assign(proxy.style, {
+          display: width ? "block" : "none",
+          height: `${height}px`,
+          transform: `translate(${left}px, ${top}px)`,
+          width: `${width}px`,
+        });
+      }
+      frame = requestAnimationFrame(sync);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isOpened, window]);
+
+  return (
+    <div
+      className={cn("absolute top-0 left-0 hidden", WINDOW_CLASSNAME)}
+      ref={proxyRef}
+    />
   );
 }
