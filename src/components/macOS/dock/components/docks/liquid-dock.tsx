@@ -101,8 +101,8 @@ export function LiquidDock({ children }: { children: React.ReactNode }) {
             blur={6}
             tint={
               isDarkMode
-                ? { a: 0.1, b: 0, g: 0, r: 0 }
-                : { a: 0.2, b: 1, g: 1, r: 1 }
+                ? { a: 0.2, b: 0, g: 0, r: 0 }
+                : { a: 0.4, b: 0.7, g: 0.7, r: 0.7 }
             }
           >
             {/* Intrinsic: liquid-dom measures the icons itself, so the glass
