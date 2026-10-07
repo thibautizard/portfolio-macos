@@ -34,11 +34,13 @@ function Container({ children }: { children: React.ReactNode }) {
 
 function Apps() {
   const { resize, showTooltip } = useDockContext();
-  const flexCentered = "flex items-center h-full gap-x-0 py-2 px-2.5";
+  const flexCentered = "flex items-center h-full py-2 px-2.5";
   return (
     <div className={flexCentered}>
-      <FinderApp onHover={showTooltip} />
-      <RegularApps onHover={showTooltip} />
+      <div className="flex h-full">
+        <FinderApp onHover={showTooltip} />
+        <RegularApps onHover={showTooltip} />
+      </div>
       <DockSeparator onMouseDown={resize} />
       <TrashApp onClick={() => {}} onHover={showTooltip} />
     </div>
