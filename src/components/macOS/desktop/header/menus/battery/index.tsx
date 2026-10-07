@@ -10,6 +10,13 @@ import {
   MenuTrigger,
 } from "../menu";
 import {
+  Battery0Percent,
+  Battery25Percent,
+  Battery50Percent,
+  Battery75Percent,
+  Battery100Percent,
+} from "./components/batteries";
+import {
   BatteryContextProvider,
   useBatteryContext,
 } from "./contexts/battery-context";
@@ -18,110 +25,123 @@ export function Battery() {
   return (
     <BatteryContextProvider>
       <Menu>
-        <MenuTrigger>
-          <BatteryIcon />
-        </MenuTrigger>
-        <MenuPopup>
-          <MenuContent />
-        </MenuPopup>
+        <BatteryTrigger />
+        <BatteryPopup />
       </Menu>
     </BatteryContextProvider>
   );
 }
 
+// 🔋 Battery icon
+function BatteryTrigger() {
+  const { battery } = useBatteryContext();
+  if (!battery) return null;
+
+  const roundedBatteryLevel = Math.round(battery.percent / 25) * 25;
+
+  return (
+    <MenuTrigger>
+      <div className="size-6.5 h-fit">
+        {roundedBatteryLevel === 100 && <Battery100Percent />}
+        {roundedBatteryLevel === 75 && <Battery75Percent />}
+        {roundedBatteryLevel === 50 && <Battery50Percent />}
+        {roundedBatteryLevel === 25 && <Battery25Percent />}
+        {roundedBatteryLevel === 0 && <Battery0Percent />}
+      </div>
+    </MenuTrigger>
+  );
+}
+
 // 🪟
-function MenuContent() {
+function BatteryPopup() {
+  const { battery } = useBatteryContext();
+
+  if (!battery) return null;
+
+  return (
+    <MenuPopup>
+      {/* 🔋 */}
+      <div className="flex flex-col my-2 mx-2">
+        <BatteryAndPercent />
+        <PowerSource />
+      </div>
+      <MenuSeparator className="mx-2" />
+      {/* 🔌 */}
+      <EnergyMode />
+      <MenuSeparator className="my-1" />
+      {/* ⚙️ */}
+      <BatterySettings />
+    </MenuPopup>
+  );
+}
+
+function BatteryAndPercent() {
   const { battery } = useBatteryContext();
   const { isDarkMode } = useDarkMode();
 
   if (!battery) return null;
-
   return (
-    <>
-      {/* 🔋 Battery */}
-      <div className="flex flex-col my-2 mx-2">
-        <div className="text-[.82rem] mb-1.5 flex justify-between">
-          <span
-            className={cn(
-              "font-bold tracking-tight",
-              "text-black",
-              isDarkMode && "text-white",
-            )}
-          >
-            Battery
-          </span>
-          <span className={cn("text-gray-600", isDarkMode && "text-gray-300")}>
-            {battery.percent} %
-          </span>
-        </div>
-        <div className={cn("text-gray-600", isDarkMode && "text-gray-300")}>
-          Power source: Battery
-        </div>
-      </div>
-
-      <MenuSeparator className="mx-2" />
-
-      {/* ⚡ Energy mode */}
-      <MenuGroup>
-        <MenuGroupLabel>Energy Mode</MenuGroupLabel>
-        <MenuItem>
-          <div
-            className={cn(
-              "size-6.5 p-0.5 rounded-full grid place-items-center",
-              "bg-black/10",
-              isDarkMode && "bg-white/10",
-            )}
-          >
-            <BatteryForPowerMode />
-          </div>
-          <span className="text-[.82rem]">Low Power</span>
-        </MenuItem>
-      </MenuGroup>
-
-      {/* <MenuSeparator className="mx-2" />
-
-					<div>No app using significant energy</div> */}
-
-      <MenuSeparator className="my-1" />
-
-      {/* ⚙️ Battery settings */}
-      <MenuItem className="text-[.82rem] font-medium">
-        Battery Settings...
-      </MenuItem>
-    </>
+    <div className="text-[.82rem] mb-1.5 flex justify-between">
+      <span
+        className={cn(
+          "font-bold tracking-tight",
+          "text-black",
+          isDarkMode && "text-white",
+        )}
+      >
+        Battery
+      </span>
+      <span className={cn("text-gray-600", isDarkMode && "text-gray-300")}>
+        {battery.percent} %
+      </span>
+    </div>
   );
 }
 
-// ----------------------------------------------------------------
-// 🔋 Battery
-
-function BatteryIcon() {
+function PowerSource() {
+  const { isDarkMode } = useDarkMode();
   const { battery } = useBatteryContext();
+
   if (!battery) return null;
+  const label = battery.charging
+    ? "Power source: Power Adapter"
+    : "Power source: Battery";
 
   return (
-    <div className="size-6.5 h-fit">
-      <svg
-        version="1.1"
-        viewBox="0 0 28.901 13.2239"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <title>battery</title>
-        <g>
-          <rect height="13.2239" opacity="0" width="28.901" x="0" y="0" />
-          <path
-            d="M5.20687 13.2199L20.5548 13.2199C22.2235 13.2199 23.6198 13.0596 24.622 12.0698C25.6118 11.0676 25.7596 9.67552 25.7596 8.013L25.7596 5.20687C25.7596 3.54434 25.6118 2.15012 24.622 1.16038C23.6177 0.160283 22.2235 0 20.5548 0L5.18577 0C3.55067 0 2.14188 0.162393 1.14179 1.16249C0.149932 2.15434 0 3.54856 0 5.18366L0 8.013C0 9.67552 0.147822 11.0697 1.13968 12.0698C2.14188 13.0596 3.5361 13.2199 5.20687 13.2199ZM4.93695 11.6513C3.93656 11.6513 2.87758 11.5096 2.2877 10.9197C1.69781 10.3298 1.57069 9.28542 1.57069 8.28292L1.57069 4.9684C1.57069 3.93867 1.69781 2.89828 2.28559 2.29805C2.87547 1.70605 3.94078 1.57893 4.9684 1.57893L20.8248 1.57893C21.8251 1.57893 22.882 1.71027 23.4719 2.30016C24.0618 2.90039 24.191 3.93445 24.191 4.9473L24.191 8.28292C24.191 9.28542 24.0597 10.3298 23.4719 10.9197C22.882 11.5117 21.8251 11.6513 20.8248 11.6513ZM27.0951 9.13599C27.8652 9.08826 28.901 8.10022 28.901 6.60993C28.901 5.11964 27.8652 4.13161 27.0951 4.08388Z"
-            fill="white"
-            fillOpacity="0.5"
-          />
-          <path
-            d="M4.42152 10.5103L21.3381 10.5103C22.0172 10.5103 22.4089 10.4123 22.6691 10.1397C22.9417 9.86495 23.0521 9.47324 23.0521 8.80869L23.0521 4.41117C23.0521 3.74241 22.9417 3.35492 22.6815 3.08018C22.4089 2.80965 22.0026 2.71992 21.3381 2.71992L4.44262 2.71992C3.75698 2.71992 3.34859 2.80754 3.08842 3.07807C2.8179 3.35281 2.70957 3.74874 2.70957 4.44262L2.70957 8.80869C2.70957 9.47746 2.8179 9.86495 3.08842 10.1397C3.36316 10.4102 3.75909 10.5103 4.42152 10.5103Z"
-            fill="white"
-            fillOpacity="1"
-          />
-        </g>
-      </svg>
+    <div className={cn("text-gray-600", isDarkMode && "text-gray-300")}>
+      {label}
     </div>
+  );
+}
+
+function EnergyMode() {
+  const { isDarkMode } = useDarkMode();
+
+  return (
+    <MenuGroup>
+      <MenuGroupLabel>Energy Mode</MenuGroupLabel>
+      <MenuItem>
+        <div
+          className={cn(
+            "size-6.5 p-0.5 rounded-full grid place-items-center",
+            "bg-black/10",
+            isDarkMode && "bg-white/10",
+          )}
+        >
+          <Battery25Percent fill="#1e2939" />
+          {/*<BatteryForPowerMode />*/}
+        </div>
+        <span className="text-[.82rem]">Low Power</span>
+      </MenuItem>
+    </MenuGroup>
+  );
+}
+
+function BatterySettings() {
+  return (
+    <MenuItem className="text-[.82rem] font-medium">
+      Battery Settings...
+    </MenuItem>
   );
 }
 
