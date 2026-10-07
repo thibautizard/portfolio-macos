@@ -40,8 +40,8 @@ function CloseIcon({ color }: { color: string }) {
       <path
         d="M1 1L7 7M7 1L1 7"
         stroke={color}
-        stroke-linecap="round"
-        stroke-width="2"
+        strokeLinecap="round"
+        strokeWidth="2"
       />
     </svg>
   );
@@ -73,7 +73,7 @@ function ReduceIcon({ color }: { color: string }) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <title>Reduce icon</title>
-      <path d="M0 1H8" stroke={color} stroke-width="2" />
+      <path d="M0 1H8" stroke={color} strokeWidth="2" />
     </svg>
   );
 }
@@ -105,14 +105,14 @@ function ExpandIcon({ color }: { color: string }) {
       <path
         d="M5.1819 5.16941L3.76953 5.1709L5.18042 3.75704L5.1819 5.16941Z"
         stroke={color}
-        stroke-linecap="round"
-        stroke-width="2.5"
+        strokeLinecap="round"
+        strokeWidth="2.5"
       />
       <path
         d="M1.25561 1.26506L2.66797 1.26025L1.26042 2.67743L1.25561 1.26506Z"
         stroke={color}
-        stroke-linecap="round"
-        stroke-width="2.5"
+        strokeLinecap="round"
+        strokeWidth="2.5"
       />
     </svg>
   );
