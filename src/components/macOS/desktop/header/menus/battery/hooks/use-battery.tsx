@@ -1,42 +1,32 @@
-import { useEffect, useState } from "react";
-import type { BatteryManager, NavigatorWithBattery } from "../types";
+import { useSyncExternalStore } from "react";
 
-export function useBattery() {
-  const [battery, setBattery] = useState<BatteryManager | null>(null);
-  const [batteryLevel, setBatteryLevel] = useState(1);
-  const [batteryCharging, setBatteryCharging] = useState(false);
+let snapshot: { charging: boolean; percent: number } | null = null;
+const listeners = new Set<() => void>();
 
-  useEffect(() => {
-    const nav = navigator as NavigatorWithBattery;
-    if (!nav.getBattery) return;
+// Resolved once at module level: useSyncExternalStore needs sync subscribe/getSnapshot
+window.navigator.getBattery?.().then((battery) => {
+  const update = () => {
+    const percent = Math.round(battery.level * 100);
+    if (snapshot?.percent === percent && snapshot.charging === battery.charging)
+      return;
+    snapshot = { charging: battery.charging, percent };
+    for (const listener of listeners) listener();
+  };
+  update();
+  battery.addEventListener("levelchange", update);
+  battery.addEventListener("chargingchange", update);
+});
 
-    const controller = new AbortController();
-    const { signal } = controller;
-
-    nav.getBattery().then((bat) => {
-      if (signal.aborted) return;
-
-      setBattery(bat);
-      setBatteryLevel(roundLevel(bat.level));
-      setBatteryCharging(bat.charging);
-
-      const handleLevelChange = () => setBatteryLevel(roundLevel(bat.level));
-      const handleChargingChange = () => setBatteryCharging(bat.charging);
-
-      bat.addEventListener("levelchange", handleLevelChange, {
-        signal,
-      });
-      bat.addEventListener("chargingchange", handleChargingChange, {
-        signal,
-      });
-    });
-
-    return () => controller.abort();
-  }, []);
-
-  return { battery, batteryCharging, batteryLevel };
+function subscribe(callback: () => void) {
+  listeners.add(callback);
+  return () => listeners.delete(callback);
 }
 
-function roundLevel(value: number): number {
-  return Math.round(value * 100) / 100;
+function getSnapshot() {
+  return snapshot;
+}
+
+export function useBattery() {
+  const battery = useSyncExternalStore(subscribe, getSnapshot);
+  return battery;
 }
