@@ -10,98 +10,98 @@ import { DockContextProvider, useDockContext } from "./contexts/dock-context";
 import { regularApps, trashApp } from "./types/dock-types";
 
 export function Dock() {
-  const Dock = supportsLiquidGlass ? LiquidDock : FallbackDock;
-  return (
-    <DockContextProvider>
-      <Container>
-        <DockTooltip />
-        <Dock>
-          <Apps />
-        </Dock>
-      </Container>
-    </DockContextProvider>
-  );
+	const Dock = supportsLiquidGlass ? LiquidDock : FallbackDock;
+	return (
+		<DockContextProvider>
+			<Container>
+				<DockTooltip />
+				<Dock>
+					<Apps />
+				</Dock>
+			</Container>
+		</DockContextProvider>
+	);
 }
 
 // 📦
 function Container({ children }: { children: React.ReactNode }) {
-  const centerFixedBottom = "relative mx-auto mb-1.5 w-max";
-  return <div className={centerFixedBottom}>{children}</div>;
+	const centerFixedBottom = "relative mx-auto mb-1.5 w-max";
+	return <div className={centerFixedBottom}>{children}</div>;
 }
 
 // ----------------------------------------------------------------
 // 🟧🟥🟨
 
 function Apps() {
-  const { resize, showTooltip } = useDockContext();
-  const flexCentered = "flex items-center h-full py-2 px-2.5";
-  return (
-    <div className={flexCentered}>
-      <div className="flex h-full">
-        <FinderApp onHover={showTooltip} />
-        <RegularApps onHover={showTooltip} />
-      </div>
-      <DockSeparator onMouseDown={resize} />
-      <TrashApp onClick={() => {}} onHover={showTooltip} />
-    </div>
-  );
+	const { resize, showTooltip } = useDockContext();
+	const flexCentered = "flex items-center h-full py-2 px-2.5";
+	return (
+		<div className={flexCentered}>
+			<div className="flex h-full">
+				<FinderApp onHover={showTooltip} />
+				<RegularApps onHover={showTooltip} />
+			</div>
+			<DockSeparator onMouseDown={resize} />
+			<TrashApp onClick={() => {}} onHover={showTooltip} />
+		</div>
+	);
 }
 
 function RegularApps({
-  onHover,
+	onHover,
 }: {
-  onHover: (el: HTMLElement | null, name: string) => void;
+	onHover: (el: HTMLElement | null, name: string) => void;
 }) {
-  const otherApps = regularApps.filter(({ id }) => id !== "finder");
-  return otherApps.map(({ id, name, icon }) => (
-    <DockIcon alt={name} key={id} name={name} onHover={onHover} src={icon} />
-  ));
+	const otherApps = regularApps.filter(({ id }) => id !== "finder");
+	return otherApps.map(({ id, name, icon }) => (
+		<DockIcon alt={name} key={id} name={name} onHover={onHover} src={icon} />
+	));
 }
 
 // 📂
 function FinderApp({
-  onHover,
+	onHover,
 }: {
-  onHover: (el: HTMLElement | null, name: string) => void;
+	onHover: (el: HTMLElement | null, name: string) => void;
 }) {
-  const dispatch = useAppDispatch();
-  const isOpen = useAppSelector(selectIsFinderOpen);
+	const dispatch = useAppDispatch();
+	const isOpen = useAppSelector(selectIsFinderOpen);
 
-  const finderApp = regularApps.find((app) => app.id === "finder");
-  if (!finderApp) return null;
-  const { id, name, icon } = finderApp;
+	const finderApp = regularApps.find((app) => app.id === "finder");
+	if (!finderApp) return null;
+	const { id, name, icon } = finderApp;
 
-  return (
-    <DockIcon
-      alt={name}
-      isActive={isOpen}
-      key={id}
-      name={name}
-      onClick={() => dispatch(openFinder())}
-      onHover={onHover}
-      src={icon}
-    />
-  );
+	return (
+		<DockIcon
+			alt={name}
+			isActive={isOpen}
+			key={id}
+			name={name}
+			onClick={() => dispatch(openFinder())}
+			onHover={onHover}
+			src={icon}
+		/>
+	);
 }
 
 // 🚮
 function TrashApp({
-  onHover,
-  onClick,
+	onHover,
+	onClick,
 }: {
-  onHover: (el: HTMLElement | null, name: string) => void;
-  onClick: () => void;
+	onHover: (el: HTMLElement | null, name: string) => void;
+	onClick: () => void;
 }) {
-  const { id, name, icon } = trashApp;
-  return (
-    <DockIcon
-      alt="Trash"
-      className="py-1.5"
-      key={id}
-      name={name}
-      onClick={onClick}
-      onHover={onHover}
-      src={icon}
-    />
-  );
+	const { id, name, icon } = trashApp;
+	return (
+		<DockIcon
+			alt="Trash"
+			className="py-1.5"
+			key={id}
+			name={name}
+			onClick={onClick}
+			onHover={onHover}
+			src={icon}
+		/>
+	);
 }
