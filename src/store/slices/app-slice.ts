@@ -5,12 +5,16 @@ type AppState = {
   openFinder: boolean;
   isPowerMode: boolean;
   dockHeight: number;
+  brightness: number;
+  soundLevel: number;
 };
 
 const initialState: AppState = {
   dockHeight: 0,
   isPowerMode: false,
   openFinder: false,
+  brightness: 1,
+  soundLevel: 1,
 };
 
 const appSlice = createSlice({
@@ -32,11 +36,25 @@ const appSlice = createSlice({
     togglePowerMode(state) {
       state.isPowerMode = !state.isPowerMode;
     },
+    // 🔊
+    setSoundLevel(state, action: PayloadAction<number>) {
+      state.soundLevel = action.payload;
+    },
+    // 🔆
+    setBrightness(state, action: PayloadAction<number>) {
+      state.brightness = action.payload;
+    },
   },
 });
 
-export const { openFinder, closeFinder, setDockHeight, togglePowerMode } =
-  appSlice.actions;
+export const {
+  openFinder,
+  closeFinder,
+  setDockHeight,
+  togglePowerMode,
+  setSoundLevel,
+  setBrightness,
+} = appSlice.actions;
 export const appReducer = appSlice.reducer;
 
 // 🔍
@@ -45,3 +63,7 @@ export const selectIsFinderOpen = (state: RootState) => state.app.openFinder;
 export const selectDockHeight = (state: RootState) => state.app.dockHeight;
 // 🔋
 export const selectIsPowerMode = (state: RootState) => state.app.isPowerMode;
+// 🔆
+export const selectBrightness = (state: RootState) => state.app.brightness;
+// 🔊
+export const selectSoundLevel = (state: RootState) => state.app.soundLevel;

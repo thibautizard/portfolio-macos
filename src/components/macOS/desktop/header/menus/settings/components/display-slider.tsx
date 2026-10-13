@@ -1,11 +1,19 @@
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectBrightness, setBrightness } from "@/store/slices/app-slice";
 import { GlassLong } from "./glass-long";
 import { Slider } from "./slider";
+
 export function DisplaySlider() {
+	const dispatch = useAppDispatch();
+	const brightness = useAppSelector(selectBrightness);
 	return (
 		<GlassLong name="Display">
 			<div className="flex gap-x-2 items-center">
 				<SunDim />
-				<Slider />
+				<Slider
+					onChange={(value) => dispatch(setBrightness(value))}
+					value={brightness}
+				/>
 				<Sun />
 			</div>
 		</GlassLong>
