@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: exception */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: keyboard reaches the real buttons directly, only pointer clicks hit the canvas */
 import {
   Frame,
   Glass,
@@ -10,7 +12,13 @@ import {
   ZStack,
 } from "@liquid-dom/react";
 import { cn } from "cn";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  type RefObject,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useDarkMode } from "usehooks-ts";
 import wallpaperTahoeDark from "@/assets/macOS/wallpapers/wallpaper_tahoe_dark.avif";
 import wallpaperTahoeLight from "@/assets/macOS/wallpapers/wallpaper_tahoe_light.avif";
@@ -31,10 +39,14 @@ const LONG = { height: 64, width: SQUARE.width * 2 + GAP };
 const WIDTH = LONG.width + PADDING * 2;
 const HEIGHT = SQUARE.height + LONG.height * 2 + GAP * 2 + PADDING * 2;
 const CANVAS_STYLE = { display: "block", height: "100%", width: "100%" };
+const TILE_SELECTOR = "[data-tile]";
+const SLIDER_SELECTOR = "[data-slider]";
+const BUTTON_SELECTOR = "button";
 
 /** Settings menu rendered with liquid-dom (WebGPU + HTML-in-Canvas only). */
 export function LiquidMenu({ isOpened }: { isOpened: boolean }) {
   const hostRef = useRef<HTMLDivElement>(null);
+  const hoveredRef = useRef<HTMLElement>(undefined);
   const [offset, setOffset] = useState({ left: 0, top: 0 });
   const { isDarkMode } = useDarkMode();
 
@@ -78,6 +90,10 @@ export function LiquidMenu({ isOpened }: { isOpened: boolean }) {
         "transition-opacity duration-300",
         isOpened ? "opacity-100" : "opacity-0 pointer-events-none",
       )}
+      onClick={forwardClick}
+      onPointerDown={forwardDrag}
+      onPointerLeave={() => forwardHover(undefined, hoveredRef)}
+      onPointerMove={(e) => forwardHover(elementAt(e, TILE_SELECTOR), hoveredRef)}
       ref={hostRef}
       style={{ height: HEIGHT, width: WIDTH }}
     >
@@ -143,10 +159,57 @@ function Tile({
   return (
     <Frame height={height} width={width}>
       <Glass cornerRadius={cornerRadius} cornerSmoothing={0.25}>
-        <Html sizing="fill">{children}</Html>
+        <Html sizing="fill">
+          <div className="group size-full" data-tile="">
+            {children}
+          </div>
+        </Html>
       </Glass>
     </Frame>
   );
+}
+
+// ------------------------------------------------------------------------------
+// 🎯 The canvas receives the pointer events, not the HTML drawn inside it:
+// hit-test its children by hand
+function elementAt(e: React.MouseEvent<HTMLElement>, selector: string) {
+  const elements = e.currentTarget.querySelectorAll<HTMLElement>(selector);
+  return Array.from(elements).find((el) => {
+    const { left, right, top, bottom } = el.getBoundingClientRect();
+    return (
+      e.clientX >= left &&
+      e.clientX <= right &&
+      e.clientY >= top &&
+      e.clientY <= bottom
+    );
+  });
+}
+
+// 🖱️ Re-dispatch the click on the button under the pointer
+// (only when it hit the canvas, so the forwarded click doesn't loop back here)
+function forwardClick(e: React.MouseEvent<HTMLElement>) {
+  if (!(e.target instanceof HTMLCanvasElement)) return;
+  elementAt(e, BUTTON_SELECTOR)?.click();
+}
+
+// 🎚️ Re-dispatch the press on the slider under the pointer: it then follows
+// the native moves itself, as they bubble from the canvas up to window
+function forwardDrag(e: React.PointerEvent<HTMLElement>) {
+  if (!(e.target instanceof HTMLCanvasElement)) return;
+  elementAt(e, SLIDER_SELECTOR)?.dispatchEvent(
+    new PointerEvent("pointerdown", e.nativeEvent),
+  );
+}
+
+// 🫳 :hover never reaches the tile under the canvas: flag the hovered one
+function forwardHover(
+  tile: HTMLElement | undefined,
+  hoveredRef: RefObject<HTMLElement | undefined>,
+) {
+  if (tile === hoveredRef.current) return;
+  if (hoveredRef.current) delete hoveredRef.current.dataset.hovered;
+  if (tile) tile.dataset.hovered = "";
+  hoveredRef.current = tile;
 }
 
 // ------------------------------------------------------------------------------

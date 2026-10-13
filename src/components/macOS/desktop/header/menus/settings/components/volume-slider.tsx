@@ -1,11 +1,12 @@
 import { GlassLong } from "./glass-long";
+import { Slider } from "./slider";
 
 export function VolumeSlider() {
 	return (
 		<GlassLong name="Sound">
 			<div className="flex gap-x-2 items-center">
 				<SoundEmpty />
-				<div className="h-1 rounded-md grow bg-white" />
+				<Slider />
 				<SoundFull />
 			</div>
 		</GlassLong>

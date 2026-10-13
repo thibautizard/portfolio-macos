@@ -1,77 +1,72 @@
 import { cn } from "cn";
-import { motion, useMotionValue, useMotionValueEvent } from "motion/react";
-import { type RefObject, useLayoutEffect, useRef, useState } from "react";
-import { useDarkMode, useResizeObserver } from "usehooks-ts";
+import { useRef, useState } from "react";
+import { useDarkMode } from "usehooks-ts";
 
 export function Slider() {
 	const { isDarkMode } = useDarkMode();
-	const sliderRef = useRef<HTMLDivElement>(null);
-	const handlerRef = useRef<HTMLDivElement>(null);
-
+	const trackRef = useRef<HTMLDivElement>(null);
 	const [value, setValue] = useState(100);
-	const x = useMotionValue(0);
+	const [isDragging, setIsDragging] = useState(false);
 
-	// Observed rather than measured once: inside liquid-dom's <Html>, the slider
-	// mounts in a detached host and only gets its real size a frame later.
-	const { width: sliderWidth = 0 } = useResizeObserver({
-		box: "border-box",
-		ref: sliderRef as RefObject<HTMLDivElement>,
-	});
-	const { width: handlerWidth = 0 } = useResizeObserver({
-		box: "border-box",
-		ref: handlerRef as RefObject<HTMLDivElement>,
-	});
-	const maxRight = sliderWidth - handlerWidth;
+	const updateFromPointer = (clientX: number) => {
+		const track = trackRef.current;
+		if (!track) return;
+		const { left, width } = track.getBoundingClientRect();
+		if (!width) return;
+		setValue(Math.min(100, Math.max(0, ((clientX - left) / width) * 100)));
+	};
 
-	useLayoutEffect(() => {
-		let initialX = (value * sliderWidth) / 100;
-		if (initialX > maxRight) initialX = maxRight;
-		x.set(initialX);
-	}, [sliderWidth, value, x, maxRight]);
-
-	useMotionValueEvent(x, "change", (latest) => {
-		if (sliderWidth) {
-			let newValue = (latest / sliderWidth) * 100;
-			if (newValue < 0) newValue = 0;
-			if (newValue > 100) newValue = 100;
-			setValue(newValue);
-		}
-	});
+	// 👆 Moves are read on window: in the liquid menu only the press is forwarded
+	// to the slider, the moves land on the canvas and bubble up from there
+	const handlePointerDown = (event: React.PointerEvent) => {
+		event.preventDefault();
+		updateFromPointer(event.clientX);
+		setIsDragging(true);
+		const controller = new AbortController();
+		const { signal } = controller;
+		const stop = () => {
+			setIsDragging(false);
+			controller.abort();
+		};
+		window.addEventListener(
+			"pointermove",
+			(move) => updateFromPointer(move.clientX),
+			{ signal },
+		);
+		window.addEventListener("pointerup", stop, { signal });
+		window.addEventListener("pointercancel", stop, { signal });
+	};
 
 	return (
+		// Taller than the track so it's easy to grab
 		<div
-			className={cn(
-				"h-1 relative rounded-md grow",
-				isDarkMode && "bg-[#173FAF]",
-			)}
-			ref={sliderRef}
+			className="grow py-1.5 -my-1.5 touch-none"
+			data-slider=""
+			onPointerDown={handlePointerDown}
 		>
 			<div
-				className="bg-white rounded-md h-full"
-				style={{ width: `${value}%` }}
-			/>
-			<motion.button
-				className={cn(
-					"hidden",
-					"group-hover:block",
-					"absolute",
-					"-translate-y-1/2 top-1/2",
-				)}
-				drag="x"
-				dragConstraints={{ left: 0, right: maxRight }}
-				dragElastic={0}
-				dragMomentum={false}
-				style={{ x }}
-				type="button"
+				className={cn("h-1 relative rounded-md", isDarkMode && "bg-[#173FAF]")}
+				ref={trackRef}
 			>
 				<div
-					className="w-5 rounded-full h-3.5 bg-white"
-					ref={handlerRef}
+					className="bg-white rounded-md h-full"
+					style={{ width: `${value}%` }}
+				/>
+				<div
+					className={cn(
+						"hidden",
+						"group-hover:block group-data-hovered:block",
+						isDragging && "block",
+						"absolute -translate-y-1/2 top-1/2",
+						"w-5 rounded-full h-3.5 bg-white",
+					)}
+					// Keeps the handle inside the track at both ends
 					style={{
 						cornerShape: "superellipse(1.3)",
+						left: `calc((100% - 1.25rem) * ${value / 100})`,
 					}}
 				/>
-			</motion.button>
+			</div>
 		</div>
 	);
 }
