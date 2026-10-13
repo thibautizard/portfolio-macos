@@ -39,18 +39,23 @@ export function LiquidMenu({ isOpened }: { isOpened: boolean }) {
   const { isDarkMode } = useDarkMode();
 
   // 📍 Where the menu sits on screen, to line the backdrop up with the wallpaper.
+  // Re-measured on open: the header can shift after mount without a resize.
   useLayoutEffect(() => {
     const host = hostRef.current;
-    if (!host) return;
+    if (!host || !isOpened) return;
     const locate = () => {
-      const { left, top } = host.getBoundingClientRect();
-      setOffset({ left, top });
+      // The open/close scale is centered, so the center is the only point it doesn't move
+      const { height, left, top, width } = host.getBoundingClientRect();
+      setOffset({
+        left: left + width / 2 - WIDTH / 2,
+        top: top + height / 2 - HEIGHT / 2,
+      });
     };
     locate();
     const controller = new AbortController();
     window.addEventListener("resize", locate, { signal: controller.signal });
     return () => controller.abort();
-  }, []);
+  }, [isOpened]);
 
   // 🔍 Scale only while opening/closing, so the menu stays at scale 1 at rest
   const isFirstRender = useRef(true);
