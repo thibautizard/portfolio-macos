@@ -8,17 +8,20 @@ const Menu = MenuPrimitive.Root;
 
 const MenuPortal = MenuPrimitive.Portal;
 
-function MenuTrigger(props: MenuPrimitive.Trigger.Props) {
+function MenuTrigger({ className, ...props }: MenuPrimitive.Trigger.Props) {
 	return (
 		<MenuPrimitive.Trigger
-			className={cn(
-				"relative",
-				"grid place-items-center",
-				"before:opacity-0 before:inset-0 before:top-1/2 before:-translate-y-1/2 before:w-[40px] before:h-[24px] before:left-1/2 before:-translate-x-1/2",
-				"before:content-[''] before:absolute before:bg-white/15",
-				"before:rounded-full",
-				"data-popup-open:before:opacity-100",
-			)}
+			className={(state) =>
+				cn(
+					"relative",
+					"grid place-items-center",
+					"before:opacity-0 before:inset-0 before:top-1/2 before:-translate-y-1/2 before:w-[40px] before:h-[24px] before:left-1/2 before:-translate-x-1/2",
+					"before:content-[''] before:absolute before:bg-white/15",
+					"before:rounded-full",
+					"data-popup-open:before:opacity-100",
+					typeof className === "function" ? className(state) : className,
+				)
+			}
 			data-slot="menu-trigger"
 			type="button"
 			{...props}

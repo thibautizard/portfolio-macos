@@ -29,13 +29,7 @@ export function Battery100Percent({
   );
 }
 
-export function Battery75Percent({
-  fill = "white",
-  borderFill = "white",
-}: {
-  fill?: string;
-  borderFill?: string;
-}) {
+export function Battery75Percent({ fill = "white" }: { fill?: string }) {
   return (
     <svg
       version="1.1"
@@ -60,13 +54,7 @@ export function Battery75Percent({
   );
 }
 
-export function Battery50Percent({
-  fill = "white",
-  borderFill = "white",
-}: {
-  fill?: string;
-  borderFill?: string;
-}) {
+export function Battery50Percent({ fill = "white" }: { fill?: string }) {
   return (
     <svg
       version="1.1"
@@ -91,13 +79,7 @@ export function Battery50Percent({
   );
 }
 
-export function Battery25Percent({
-  fill = "white",
-  borderFill = "white",
-}: {
-  fill?: string;
-  borderFill?: string;
-}) {
+export function Battery25Percent({ fill = "white" }: { fill?: string }) {
   return (
     <svg
       version="1.1"
@@ -122,13 +104,7 @@ export function Battery25Percent({
   );
 }
 
-export function Battery0Percent({
-  fill = "white",
-  borderFill = "white",
-}: {
-  fill?: string;
-  borderFill?: string;
-}) {
+export function Battery0Percent({ fill = "white" }: { fill?: string }) {
   return (
     <svg
       version="1.1"

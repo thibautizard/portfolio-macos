@@ -45,8 +45,16 @@ function BatteryTrigger() {
   const roundedBatteryLevel = Math.round(battery.percent / 25) * 25;
   const yellowPowerMode = "#FFD600";
   const fill = isPowerMode ? yellowPowerMode : "white";
+
   return (
-    <MenuTrigger className="flex gap-x-1 items-center">
+    <MenuTrigger
+      className={cn(
+        "flex gap-x-1 relative items-center",
+        "before:absolute before:-z-1 before:content-[''] before:size-full before:h-5 before:bg-white before:opacity-0",
+        "before:scale-x-135 before:scale-y-130 before:rounded-full",
+        "data-popup-open:before:opacity-12",
+      )}
+    >
       <span className="text-xs leading-none!">{battery.percent} %</span>
       <div className="size-6.5 h-fit">
         {roundedBatteryLevel === 100 && <Battery100Percent fill={fill} />}
