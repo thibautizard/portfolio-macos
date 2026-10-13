@@ -18,6 +18,7 @@ import {
   Battery50Percent,
   Battery75Percent,
   Battery100Percent,
+  BatteryCharging,
 } from "./components/batteries";
 import {
   BatteryContextProvider,
@@ -56,12 +57,23 @@ function BatteryTrigger() {
       )}
     >
       <span className="text-xs leading-none!">{battery.percent} %</span>
-      <div className="size-6.5 h-fit">
-        {roundedBatteryLevel === 100 && <Battery100Percent fill={fill} />}
-        {roundedBatteryLevel === 75 && <Battery75Percent fill={fill} />}
-        {roundedBatteryLevel === 50 && <Battery50Percent fill={fill} />}
-        {roundedBatteryLevel === 25 && <Battery25Percent fill={fill} />}
-        {roundedBatteryLevel === 0 && <Battery0Percent fill={fill} />}
+      <div className="size-[1.7rem] h-fit">
+        {!battery.charging && roundedBatteryLevel === 100 && (
+          <Battery100Percent fill={fill} />
+        )}
+        {!battery.charging && roundedBatteryLevel === 75 && (
+          <Battery75Percent fill={fill} />
+        )}
+        {!battery.charging && roundedBatteryLevel === 50 && (
+          <Battery50Percent fill={fill} />
+        )}
+        {!battery.charging && roundedBatteryLevel === 25 && (
+          <Battery25Percent fill={fill} />
+        )}
+        {!battery.charging && roundedBatteryLevel === 0 && (
+          <Battery0Percent fill={fill} />
+        )}
+        {battery.charging && <BatteryCharging fill={fill} />}
       </div>
     </MenuTrigger>
   );
