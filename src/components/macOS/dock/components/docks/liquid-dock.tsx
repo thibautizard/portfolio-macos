@@ -105,8 +105,6 @@ export function LiquidDock({ children }: { children: React.ReactNode }) {
 								: { a: 0.4, b: 0.7, g: 0.7, r: 0.7 }
 						}
 					>
-						{/* Intrinsic: liquid-dom measures the icons itself, so the glass
-                never depends on a DOM size it hides (0-size HTML isn't mounted) */}
 						<Glass
 							cornerRadius={height * CORNER_RADIUS_RATIO}
 							cornerSmoothing={CORNER_SMOOTHING}
