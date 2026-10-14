@@ -1,0 +1,7 @@
+.dock-glass {
+	--dock-glass-padding: 0.125rem;
+}
+
+.dock-glass .glass-surface__content {
+	padding: var(--dock-glass-padding);
+}

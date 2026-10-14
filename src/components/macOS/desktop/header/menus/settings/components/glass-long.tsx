@@ -1,8 +1,10 @@
 import { cn } from "cn";
-import GlassSurface from "@/components/react-bits/glass-surface";
+import { TintedGlass } from "@/components/macOS/ui/tinted-glass";
 import { useIsLiquidGlass } from "./liquid-glass";
+import "./settings-glass.css";
 
-const BACKGROUND_OPACITY = 0.17;
+// Full backdrop colour; lower it (e.g. 0.8) for a grayer look
+const SATURATION = 1;
 
 export function GlassLong({
 	children,
@@ -20,6 +22,7 @@ export function GlassLong({
 		</div>
 	);
 
+	// CHROME
 	if (isLiquidGlass) {
 		return (
 			<div className="group flex items-center size-full px-4 py-0 text-white">
@@ -29,21 +32,21 @@ export function GlassLong({
 	}
 	return (
 		<div className="col-span-2 group row-span-4">
-			<GlassSurface
-				backgroundOpacity={BACKGROUND_OPACITY}
-				borderRadius={36}
+			<TintedGlass
+				borderRadius={24}
 				className={cn(
+					"settings-glass",
 					"px-2 py-1",
 					"h-full! w-full!",
 					"text-white",
-					"border-white/15 border",
 				)}
+				saturation={SATURATION}
 				style={{
 					cornerShape: "superellipse(1.5)",
 				}}
 			>
 				{content}
-			</GlassSurface>
+			</TintedGlass>
 		</div>
 	);
 }

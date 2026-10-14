@@ -4,192 +4,192 @@ import { useDarkMode } from "usehooks-ts";
 import { useAppDispatch } from "@/store/hooks";
 import { selectIsPowerMode, togglePowerMode } from "@/store/slices/app-slice";
 import {
-  Menu,
-  MenuGroup,
-  MenuGroupLabel,
-  MenuItem,
-  MenuPopup,
-  MenuSeparator,
-  MenuTrigger,
+	Menu,
+	MenuGroup,
+	MenuGroupLabel,
+	MenuItem,
+	MenuPopup,
+	MenuSeparator,
+	MenuTrigger,
 } from "../menu";
 import {
-  Battery0Percent,
-  Battery25Percent,
-  Battery50Percent,
-  Battery75Percent,
-  Battery100Percent,
-  BatteryCharging,
+	Battery0Percent,
+	Battery25Percent,
+	Battery50Percent,
+	Battery75Percent,
+	Battery100Percent,
+	BatteryCharging,
 } from "./components/batteries";
 import {
-  BatteryContextProvider,
-  useBatteryContext,
+	BatteryContextProvider,
+	useBatteryContext,
 } from "./contexts/battery-context";
 
 export function Battery() {
-  return (
-    <BatteryContextProvider>
-      <Menu>
-        <BatteryTrigger />
-        <BatteryPopup />
-      </Menu>
-    </BatteryContextProvider>
-  );
+	return (
+		<BatteryContextProvider>
+			<Menu>
+				<BatteryTrigger />
+				<BatteryPopup />
+			</Menu>
+		</BatteryContextProvider>
+	);
 }
 
 // 🔋 Battery icon
 function BatteryTrigger() {
-  const { battery } = useBatteryContext();
-  const isPowerMode = useSelector(selectIsPowerMode);
+	const { battery } = useBatteryContext();
+	const isPowerMode = useSelector(selectIsPowerMode);
 
-  if (!battery) return null;
+	if (!battery) return null;
 
-  const roundedBatteryLevel = Math.round(battery.percent / 25) * 25;
-  const yellowPowerMode = "#FFD600";
-  const fill = isPowerMode ? yellowPowerMode : "white";
+	const roundedBatteryLevel = Math.round(battery.percent / 25) * 25;
+	const yellowPowerMode = "#FFD600";
+	const fill = isPowerMode ? yellowPowerMode : "white";
 
-  return (
-    <MenuTrigger
-      className={cn(
-        "flex gap-x-1 relative items-center",
-        "before:absolute before:-z-1 before:content-[''] before:size-full before:h-5 before:bg-white before:opacity-0",
-        "before:scale-x-135 before:scale-y-130 before:rounded-full",
-        "data-popup-open:before:opacity-12",
-      )}
-    >
-      <span className="text-xs leading-none!">{battery.percent} %</span>
-      <div className="size-[1.7rem] h-fit">
-        {!battery.charging && roundedBatteryLevel === 100 && (
-          <Battery100Percent fill={fill} />
-        )}
-        {!battery.charging && roundedBatteryLevel === 75 && (
-          <Battery75Percent fill={fill} />
-        )}
-        {!battery.charging && roundedBatteryLevel === 50 && (
-          <Battery50Percent fill={fill} />
-        )}
-        {!battery.charging && roundedBatteryLevel === 25 && (
-          <Battery25Percent fill={fill} />
-        )}
-        {!battery.charging && roundedBatteryLevel === 0 && (
-          <Battery0Percent fill={fill} />
-        )}
-        {battery.charging && <BatteryCharging fill={fill} />}
-      </div>
-    </MenuTrigger>
-  );
+	return (
+		<MenuTrigger
+			className={cn(
+				"flex gap-x-1 relative items-center",
+				"before:absolute before:-z-1 before:content-[''] before:size-full before:h-5 before:bg-white before:opacity-0",
+				"before:scale-x-135 before:scale-y-130 before:rounded-full",
+				"data-popup-open:before:opacity-12",
+			)}
+		>
+			<span className="text-xs leading-none!">{battery.percent} %</span>
+			<div className="size-[1.7rem] h-fit">
+				{!battery.charging && roundedBatteryLevel === 100 && (
+					<Battery100Percent fill={fill} />
+				)}
+				{!battery.charging && roundedBatteryLevel === 75 && (
+					<Battery75Percent fill={fill} />
+				)}
+				{!battery.charging && roundedBatteryLevel === 50 && (
+					<Battery50Percent fill={fill} />
+				)}
+				{!battery.charging && roundedBatteryLevel === 25 && (
+					<Battery25Percent fill={fill} />
+				)}
+				{!battery.charging && roundedBatteryLevel === 0 && (
+					<Battery0Percent fill={fill} />
+				)}
+				{battery.charging && <BatteryCharging fill={fill} />}
+			</div>
+		</MenuTrigger>
+	);
 }
 
 // 🪟
 function BatteryPopup() {
-  const { battery } = useBatteryContext();
+	const { battery } = useBatteryContext();
 
-  if (!battery) return null;
+	if (!battery) return null;
 
-  return (
-    <MenuPopup>
-      {/* 🔋 */}
-      <div className="flex flex-col my-2 mx-2">
-        <BatteryAndPercent />
-        <PowerSource />
-      </div>
-      <MenuSeparator className="mx-2" />
-      {/* 🔌 */}
-      <EnergyMode />
-      <MenuSeparator className="my-1" />
-      {/* ⚙️ */}
-      <BatterySettings />
-    </MenuPopup>
-  );
+	return (
+		<MenuPopup>
+			{/* 🔋 */}
+			<div className="flex flex-col my-2 mx-2">
+				<BatteryAndPercent />
+				<PowerSource />
+			</div>
+			<MenuSeparator className="mx-2" />
+			{/* 🔌 */}
+			<EnergyMode />
+			<MenuSeparator className="my-1" />
+			{/* ⚙️ */}
+			<BatterySettings />
+		</MenuPopup>
+	);
 }
 
 function BatteryAndPercent() {
-  const { battery } = useBatteryContext();
-  const { isDarkMode } = useDarkMode();
+	const { battery } = useBatteryContext();
+	const { isDarkMode } = useDarkMode();
 
-  if (!battery) return null;
-  return (
-    <div className="text-[.80rem] mb-1.5 flex justify-between">
-      <span
-        className={cn(
-          "font-bold tracking-tight",
-          "text-black",
-          isDarkMode && "text-white",
-        )}
-      >
-        Battery
-      </span>
-      <span className={cn("text-gray-600", isDarkMode && "text-gray-300")}>
-        {battery.percent} %
-      </span>
-    </div>
-  );
+	if (!battery) return null;
+	return (
+		<div className="text-[.80rem] mb-1.5 flex justify-between">
+			<span
+				className={cn(
+					"font-bold tracking-tight",
+					"text-black",
+					isDarkMode && "text-white",
+				)}
+			>
+				Battery
+			</span>
+			<span className={cn("text-gray-600", isDarkMode && "text-gray-300")}>
+				{battery.percent} %
+			</span>
+		</div>
+	);
 }
 
 function PowerSource() {
-  const { isDarkMode } = useDarkMode();
-  const { battery } = useBatteryContext();
+	const { isDarkMode } = useDarkMode();
+	const { battery } = useBatteryContext();
 
-  if (!battery) return null;
-  const label = battery.charging
-    ? "Power source: Power Adapter"
-    : "Power source: Battery";
+	if (!battery) return null;
+	const label = battery.charging
+		? "Power source: Power Adapter"
+		: "Power source: Battery";
 
-  return (
-    <div className={cn("text-gray-600", isDarkMode && "text-gray-300")}>
-      {label}
-    </div>
-  );
+	return (
+		<div className={cn("text-gray-600", isDarkMode && "text-gray-300")}>
+			{label}
+		</div>
+	);
 }
 
 function EnergyMode() {
-  const { isDarkMode } = useDarkMode();
-  const dispatch = useAppDispatch();
-  const isPowerMode = useSelector(selectIsPowerMode);
+	const { isDarkMode } = useDarkMode();
+	const dispatch = useAppDispatch();
+	const isPowerMode = useSelector(selectIsPowerMode);
 
-  const bluePowerMode = "#0091FF";
-  return (
-    <MenuGroup>
-      <MenuGroupLabel>Energy Mode</MenuGroupLabel>
-      <MenuItem
-        className="group"
-        closeOnClick={false}
-        nativeButton
-        onClick={() => dispatch(togglePowerMode())}
-      >
-        <div
-          className={cn(
-            "group-active:opacity-70",
-            "size-6.5 rounded-full grid place-items-center",
-            "bg-black/10",
-            isDarkMode && "bg-white/10",
-          )}
-          style={isPowerMode ? { backgroundColor: bluePowerMode } : {}}
-        >
-          <Battery25Percent
-            fill={
-              isPowerMode
-                ? "white"
-                : isDarkMode
-                  ? "var(--color-gray-300)"
-                  : "#1e2939"
-            }
-          />
-          {/*<BatteryForPowerMode />*/}
-        </div>
-        <span className="text-[.82rem] font-medium group-active:opacity-70">
-          Low Power
-        </span>
-      </MenuItem>
-    </MenuGroup>
-  );
+	const bluePowerMode = "#0091FF";
+	return (
+		<MenuGroup>
+			<MenuGroupLabel>Energy Mode</MenuGroupLabel>
+			<MenuItem
+				className="group"
+				closeOnClick={false}
+				nativeButton
+				onClick={() => dispatch(togglePowerMode())}
+			>
+				<div
+					className={cn(
+						"group-active:opacity-70",
+						"size-6.5 rounded-full grid place-items-center",
+						"bg-black/10",
+						isDarkMode && "bg-white/10",
+					)}
+					style={isPowerMode ? { backgroundColor: bluePowerMode } : {}}
+				>
+					<Battery25Percent
+						fill={
+							isPowerMode
+								? "white"
+								: isDarkMode
+									? "var(--color-gray-300)"
+									: "#1e2939"
+						}
+					/>
+					{/*<BatteryForPowerMode />*/}
+				</div>
+				<span className="text-[.82rem] font-medium group-active:opacity-70">
+					Low Power
+				</span>
+			</MenuItem>
+		</MenuGroup>
+	);
 }
 
 function BatterySettings() {
-  return (
-    <MenuItem className="text-[.82rem] font-medium">
-      Battery Settings...
-    </MenuItem>
-  );
+	return (
+		<MenuItem className="text-[.82rem] font-medium">
+			Battery Settings...
+		</MenuItem>
+	);
 }
 
 // function BatteryForPowerMode() {

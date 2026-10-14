@@ -1,0 +1,16 @@
+/* Much more transparent, neutral variant of TintedGlass for the settings tiles */
+
+.tinted-glass.settings-glass {
+	/* Barely-there gray tint; raise the alpha to make the tiles more opaque */
+	--tinted-glass-tint: light-dark(hsl(0 0% 50% / 0.04), hsl(0 0% 45% / 0.06));
+}
+
+/* Frosted fallback (no refraction): lighter blur, no white sheen */
+.tinted-glass.settings-glass.glass-surface--fallback {
+	-webkit-backdrop-filter: blur(4px) saturate(var(--glass-saturation, 1));
+	backdrop-filter: blur(4px) saturate(var(--glass-saturation, 1));
+}
+
+.tinted-glass.settings-glass .glass-surface__sheen {
+	display: none;
+}

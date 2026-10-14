@@ -55,7 +55,7 @@ function Background() {
 					"absolute inset-0",
 					"scale-200",
 					"backdrop-blur-3xl",
-					"bg-linear-to-r from-black/40 to-black/40",
+					"bg-linear-to-r from-black/10 to-black/10",
 					"mask-x-from-50 mask-y-from-50",
 				)}
 			/>

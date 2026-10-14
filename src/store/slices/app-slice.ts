@@ -2,58 +2,58 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../index";
 
 type AppState = {
-  openFinder: boolean;
-  isPowerMode: boolean;
-  dockHeight: number;
-  brightness: number;
-  soundLevel: number;
+	openFinder: boolean;
+	isPowerMode: boolean;
+	dockHeight: number;
+	brightness: number;
+	soundLevel: number;
 };
 
 const initialState: AppState = {
-  dockHeight: 0,
-  isPowerMode: false,
-  openFinder: false,
-  brightness: 1,
-  soundLevel: 1,
+	brightness: 1,
+	dockHeight: 0,
+	isPowerMode: false,
+	openFinder: false,
+	soundLevel: 1,
 };
 
 const appSlice = createSlice({
-  initialState,
-  name: "app",
-  reducers: {
-    // 🔍
-    closeFinder(state) {
-      state.openFinder = false;
-    },
-    openFinder(state) {
-      state.openFinder = true;
-    },
-    // 🟧🟡
-    setDockHeight(state, action: PayloadAction<number>) {
-      state.dockHeight = action.payload;
-    },
-    // 🔋
-    togglePowerMode(state) {
-      state.isPowerMode = !state.isPowerMode;
-    },
-    // 🔊
-    setSoundLevel(state, action: PayloadAction<number>) {
-      state.soundLevel = action.payload;
-    },
-    // 🔆
-    setBrightness(state, action: PayloadAction<number>) {
-      state.brightness = action.payload;
-    },
-  },
+	initialState,
+	name: "app",
+	reducers: {
+		// 🔍
+		closeFinder(state) {
+			state.openFinder = false;
+		},
+		openFinder(state) {
+			state.openFinder = true;
+		},
+		// 🔆
+		setBrightness(state, action: PayloadAction<number>) {
+			state.brightness = action.payload;
+		},
+		// 🟧🟡
+		setDockHeight(state, action: PayloadAction<number>) {
+			state.dockHeight = action.payload;
+		},
+		// 🔊
+		setSoundLevel(state, action: PayloadAction<number>) {
+			state.soundLevel = action.payload;
+		},
+		// 🔋
+		togglePowerMode(state) {
+			state.isPowerMode = !state.isPowerMode;
+		},
+	},
 });
 
 export const {
-  openFinder,
-  closeFinder,
-  setDockHeight,
-  togglePowerMode,
-  setSoundLevel,
-  setBrightness,
+	openFinder,
+	closeFinder,
+	setDockHeight,
+	togglePowerMode,
+	setSoundLevel,
+	setBrightness,
 } = appSlice.actions;
 export const appReducer = appSlice.reducer;
 

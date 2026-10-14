@@ -1,8 +1,10 @@
 import { cn } from "cn";
-import GlassSurface from "@/components/react-bits/glass-surface";
+import { TintedGlass } from "@/components/macOS/ui/tinted-glass";
 import { useIsLiquidGlass } from "./liquid-glass";
+import "./settings-glass.css";
 
-const BACKGROUND_OPACITY = 0.17;
+// Full backdrop colour; lower it (e.g. 0.8) for a grayer look
+const SATURATION = 1;
 
 export function GlassSquare({ children }: { children: React.ReactNode }) {
 	const isLiquidGlass = useIsLiquidGlass();
@@ -14,20 +16,15 @@ export function GlassSquare({ children }: { children: React.ReactNode }) {
 		);
 	}
 	return (
-		<GlassSurface
-			backgroundOpacity={BACKGROUND_OPACITY}
-			borderRadius={42}
-			className={cn(
-				"py-2",
-				"h-full! w-full!",
-				"text-white",
-				"border-white/15 border",
-			)}
+		<TintedGlass
+			borderRadius={30}
+			className={cn("settings-glass", "py-2", "h-full! w-full!", "text-white")}
+			saturation={SATURATION}
 			style={{
 				cornerShape: "superellipse(1.5)",
 			}}
 		>
 			{children}
-		</GlassSurface>
+		</TintedGlass>
 	);
 }
