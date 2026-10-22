@@ -6,50 +6,50 @@ import { AppSwitcher } from "@/components/macOS/app-switcher/app-switcher";
 import { Dock } from "@/components/macOS/dock";
 import { useAppSelector } from "@/store/hooks";
 import { selectBrightness } from "@/store/slices/app-slice";
-import { Finder } from "../finder";
+import { Finder } from "../apps/finder";
 import { Header } from "./header/header";
 
 export function Layout() {
-	const { isDarkMode } = useDarkMode();
-	const parentRef = useRef<HTMLDivElement>(null);
-	const desktopRef = useRef<HTMLDivElement>(null);
-	const brightness = useAppSelector(selectBrightness);
+  const { isDarkMode } = useDarkMode();
+  const parentRef = useRef<HTMLDivElement>(null);
+  const desktopRef = useRef<HTMLDivElement>(null);
+  const brightness = useAppSelector(selectBrightness);
 
-	return (
-		<div
-			className="w-screen font-sf-pro text-sm text-white flex flex-col h-screen bg-cover bg-center"
-			ref={desktopRef}
-			style={{
-				backgroundImage: `url(${isDarkMode ? wallpaperTahoeDark : wallpaperTahoeLight})`,
-				opacity: Math.max(brightness, 0.1),
-			}}
-		>
-			{/* ⬆️ */}
-			<Header />
-			{/* 🖥️ */}
-			<main className="relative grow flex flex-col">
-				<Content ref={parentRef}>
-					<Finder parentRef={parentRef} />
-				</Content>
-				<AppSwitcher desktopRef={desktopRef} />
-				<Dock />
-			</main>
-		</div>
-	);
+  return (
+    <div
+      className="w-screen font-sf-pro text-sm text-white flex flex-col h-screen bg-cover bg-center"
+      ref={desktopRef}
+      style={{
+        backgroundImage: `url(${isDarkMode ? wallpaperTahoeDark : wallpaperTahoeLight})`,
+        opacity: Math.max(brightness, 0.1),
+      }}
+    >
+      {/* ⬆️ */}
+      <Header />
+      {/* 🖥️ */}
+      <main className="relative grow flex flex-col">
+        <Content ref={parentRef}>
+          <Finder parentRef={parentRef} />
+        </Content>
+        <AppSwitcher desktopRef={desktopRef} />
+        <Dock />
+      </main>
+    </div>
+  );
 }
 
 // 📦
 // ==============================
 export function Content({
-	children,
-	ref,
+  children,
+  ref,
 }: {
-	children: React.ReactNode;
-	ref: React.RefObject<HTMLDivElement | null>;
+  children: React.ReactNode;
+  ref: React.RefObject<HTMLDivElement | null>;
 }) {
-	return (
-		<div className="relative grow grid place-items-center" ref={ref}>
-			{children}
-		</div>
-	);
+  return (
+    <div className="relative grow grid place-items-center" ref={ref}>
+      {children}
+    </div>
+  );
 }

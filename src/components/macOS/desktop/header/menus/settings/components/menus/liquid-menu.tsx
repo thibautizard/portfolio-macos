@@ -1,31 +1,31 @@
 /** biome-ignore-all lint/a11y/noStaticElementInteractions: exception */
 /** biome-ignore-all lint/a11y/useKeyWithClickEvents: keyboard reaches the real buttons directly, only pointer clicks hit the canvas */
 import {
-	Frame,
-	Glass,
-	GlassContainer,
-	HStack,
-	Html,
-	LiquidCanvas,
-	Padding,
-	VStack,
-	ZStack,
+  Frame,
+  Glass,
+  GlassContainer,
+  HStack,
+  Html,
+  LiquidCanvas,
+  Padding,
+  VStack,
+  ZStack,
 } from "@liquid-dom/react";
 import { cn } from "cn";
 import {
-	type RefObject,
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
+  type RefObject,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
 } from "react";
 import { useDarkMode } from "usehooks-ts";
 import wallpaperTahoeDark from "@/assets/macOS/wallpapers/wallpaper_tahoe_dark.avif";
 import wallpaperTahoeLight from "@/assets/macOS/wallpapers/wallpaper_tahoe_light.avif";
 import {
-	useWindows,
-	WINDOW_CLASSNAME,
-} from "@/components/macOS/finder/window-registry";
+  useWindows,
+  WINDOW_CLASSNAME,
+} from "@/components/macOS/apps/window-registry";
 import { DisplaySlider } from "../display-slider";
 import { LiquidGlassProvider } from "../liquid-glass";
 import { MusicPlayer } from "../music-player";
@@ -45,251 +45,251 @@ const BUTTON_SELECTOR = "button";
 
 /** Settings menu rendered with liquid-dom (WebGPU + HTML-in-Canvas only). */
 export function LiquidMenu({ isOpened }: { isOpened: boolean }) {
-	const hostRef = useRef<HTMLDivElement>(null);
-	const hoveredRef = useRef<HTMLElement>(undefined);
-	const [offset, setOffset] = useState({ left: 0, top: 0 });
-	const { isDarkMode } = useDarkMode();
+  const hostRef = useRef<HTMLDivElement>(null);
+  const hoveredRef = useRef<HTMLElement>(undefined);
+  const [offset, setOffset] = useState({ left: 0, top: 0 });
+  const { isDarkMode } = useDarkMode();
 
-	// 📍 Where the menu sits on screen, to line the backdrop up with the wallpaper.
-	// Re-measured on open: the header can shift after mount without a resize.
-	useLayoutEffect(() => {
-		const host = hostRef.current;
-		if (!host || !isOpened) return;
-		const locate = () => {
-			// The open/close scale is centered, so the center is the only point it doesn't move
-			const { height, left, top, width } = host.getBoundingClientRect();
-			setOffset({
-				left: left + width / 2 - WIDTH / 2,
-				top: top + height / 2 - HEIGHT / 2,
-			});
-		};
-		locate();
-		const controller = new AbortController();
-		window.addEventListener("resize", locate, { signal: controller.signal });
-		return () => controller.abort();
-	}, [isOpened]);
+  // 📍 Where the menu sits on screen, to line the backdrop up with the wallpaper.
+  // Re-measured on open: the header can shift after mount without a resize.
+  useLayoutEffect(() => {
+    const host = hostRef.current;
+    if (!host || !isOpened) return;
+    const locate = () => {
+      // The open/close scale is centered, so the center is the only point it doesn't move
+      const { height, left, top, width } = host.getBoundingClientRect();
+      setOffset({
+        left: left + width / 2 - WIDTH / 2,
+        top: top + height / 2 - HEIGHT / 2,
+      });
+    };
+    locate();
+    const controller = new AbortController();
+    window.addEventListener("resize", locate, { signal: controller.signal });
+    return () => controller.abort();
+  }, [isOpened]);
 
-	// 🔍 Scale only while opening/closing, so the menu stays at scale 1 at rest
-	const isFirstRender = useRef(true);
-	useEffect(() => {
-		if (isFirstRender.current) {
-			isFirstRender.current = false;
-			return;
-		}
-		const scales = isOpened ? ["1.02", "1"] : ["1", "1.02"];
-		hostRef.current?.animate(
-			scales.map((scale) => ({ scale })),
-			{ duration: 300, easing: "ease" },
-		);
-	}, [isOpened]);
+  // 🔍 Scale only while opening/closing, so the menu stays at scale 1 at rest
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const scales = isOpened ? ["1.02", "1"] : ["1", "1.02"];
+    hostRef.current?.animate(
+      scales.map((scale) => ({ scale })),
+      { duration: 300, easing: "ease" },
+    );
+  }, [isOpened]);
 
-	return (
-		<div
-			className={cn(
-				"fixed right-0 -z-2",
-				"transition-opacity duration-300",
-				isOpened ? "opacity-100" : "opacity-0 pointer-events-none",
-			)}
-			onClick={forwardClick}
-			onPointerDown={forwardDrag}
-			onPointerLeave={() => forwardHover(undefined, hoveredRef)}
-			onPointerMove={(e) =>
-				forwardHover(elementAt(e, TILE_SELECTOR), hoveredRef)
-			}
-			ref={hostRef}
-			style={{ height: HEIGHT, width: WIDTH }}
-		>
-			{/* The canvas needs a CSS size, or it grows by DPR every frame */}
-			<LiquidCanvas
-				canvasStyle={CANVAS_STYLE}
-				style={{ height: "100%", width: "100%" }}
-			>
-				<ZStack>
-					{/* 🖼️ The glass only refracts what's in the canvas */}
-					<Html sizing="fill">
-						<Backdrop {...offset} isOpened={isOpened} />
-					</Html>
-					{/* 🫧 */}
-					<GlassContainer
-						blur={6}
-						spacing={GAP}
-						tint={
-							isDarkMode
-								? { a: 0.2, b: 0.3, g: 0.3, r: 0.3 }
-								: { a: 0.2, b: 0.3, g: 0.3, r: 0.3 }
-						}
-					>
-						<Padding insets={PADDING}>
-							<LiquidGlassProvider value={true}>
-								<VStack spacing={GAP}>
-									<HStack spacing={GAP}>
-										<Tile {...SQUARE} cornerRadius={42}>
-											<MusicPlayer />
-										</Tile>
-										<Tile {...SQUARE} cornerRadius={42}>
-											<MusicPlayer />
-										</Tile>
-									</HStack>
-									<Tile {...LONG} cornerRadius={29}>
-										<DisplaySlider />
-									</Tile>
-									<Tile {...LONG} cornerRadius={29}>
-										<VolumeSlider />
-									</Tile>
-								</VStack>
-							</LiquidGlassProvider>
-						</Padding>
-					</GlassContainer>
-				</ZStack>
-			</LiquidCanvas>
-		</div>
-	);
+  return (
+    <div
+      className={cn(
+        "fixed right-0 -z-2",
+        "transition-opacity duration-300",
+        isOpened ? "opacity-100" : "opacity-0 pointer-events-none",
+      )}
+      onClick={forwardClick}
+      onPointerDown={forwardDrag}
+      onPointerLeave={() => forwardHover(undefined, hoveredRef)}
+      onPointerMove={(e) =>
+        forwardHover(elementAt(e, TILE_SELECTOR), hoveredRef)
+      }
+      ref={hostRef}
+      style={{ height: HEIGHT, width: WIDTH }}
+    >
+      {/* The canvas needs a CSS size, or it grows by DPR every frame */}
+      <LiquidCanvas
+        canvasStyle={CANVAS_STYLE}
+        style={{ height: "100%", width: "100%" }}
+      >
+        <ZStack>
+          {/* 🖼️ The glass only refracts what's in the canvas */}
+          <Html sizing="fill">
+            <Backdrop {...offset} isOpened={isOpened} />
+          </Html>
+          {/* 🫧 */}
+          <GlassContainer
+            blur={6}
+            spacing={GAP}
+            tint={
+              isDarkMode
+                ? { a: 0.2, b: 0.3, g: 0.3, r: 0.3 }
+                : { a: 0.2, b: 0.3, g: 0.3, r: 0.3 }
+            }
+          >
+            <Padding insets={PADDING}>
+              <LiquidGlassProvider value={true}>
+                <VStack spacing={GAP}>
+                  <HStack spacing={GAP}>
+                    <Tile {...SQUARE} cornerRadius={42}>
+                      <MusicPlayer />
+                    </Tile>
+                    <Tile {...SQUARE} cornerRadius={42}>
+                      <MusicPlayer />
+                    </Tile>
+                  </HStack>
+                  <Tile {...LONG} cornerRadius={29}>
+                    <DisplaySlider />
+                  </Tile>
+                  <Tile {...LONG} cornerRadius={29}>
+                    <VolumeSlider />
+                  </Tile>
+                </VStack>
+              </LiquidGlassProvider>
+            </Padding>
+          </GlassContainer>
+        </ZStack>
+      </LiquidCanvas>
+    </div>
+  );
 }
 // ----------------------------------------
 // ▭
 function Tile({
-	children,
-	cornerRadius,
-	height,
-	width,
+  children,
+  cornerRadius,
+  height,
+  width,
 }: {
-	children: React.ReactNode;
-	cornerRadius: number;
-	height: number;
-	width: number;
+  children: React.ReactNode;
+  cornerRadius: number;
+  height: number;
+  width: number;
 }) {
-	return (
-		<Frame height={height} width={width}>
-			<Glass cornerRadius={cornerRadius} cornerSmoothing={0.25}>
-				<Html sizing="fill">
-					<div className="group size-full" data-tile="">
-						{children}
-					</div>
-				</Html>
-			</Glass>
-		</Frame>
-	);
+  return (
+    <Frame height={height} width={width}>
+      <Glass cornerRadius={cornerRadius} cornerSmoothing={0.25}>
+        <Html sizing="fill">
+          <div className="group size-full" data-tile="">
+            {children}
+          </div>
+        </Html>
+      </Glass>
+    </Frame>
+  );
 }
 
 // ------------------------------------------------------------------------------
 // 🎯 The canvas receives the pointer events, not the HTML drawn inside it:
 // hit-test its children by hand
 function elementAt(e: React.MouseEvent<HTMLElement>, selector: string) {
-	const elements = e.currentTarget.querySelectorAll<HTMLElement>(selector);
-	return Array.from(elements).find((el) => {
-		const { left, right, top, bottom } = el.getBoundingClientRect();
-		return (
-			e.clientX >= left &&
-			e.clientX <= right &&
-			e.clientY >= top &&
-			e.clientY <= bottom
-		);
-	});
+  const elements = e.currentTarget.querySelectorAll<HTMLElement>(selector);
+  return Array.from(elements).find((el) => {
+    const { left, right, top, bottom } = el.getBoundingClientRect();
+    return (
+      e.clientX >= left &&
+      e.clientX <= right &&
+      e.clientY >= top &&
+      e.clientY <= bottom
+    );
+  });
 }
 
 // 🖱️ Re-dispatch the click on the button under the pointer
 // (only when it hit the canvas, so the forwarded click doesn't loop back here)
 function forwardClick(e: React.MouseEvent<HTMLElement>) {
-	if (!(e.target instanceof HTMLCanvasElement)) return;
-	elementAt(e, BUTTON_SELECTOR)?.click();
+  if (!(e.target instanceof HTMLCanvasElement)) return;
+  elementAt(e, BUTTON_SELECTOR)?.click();
 }
 
 // 🎚️ Re-dispatch the press on the slider under the pointer: it then follows
 // the native moves itself, as they bubble from the canvas up to window
 function forwardDrag(e: React.PointerEvent<HTMLElement>) {
-	if (!(e.target instanceof HTMLCanvasElement)) return;
-	elementAt(e, SLIDER_SELECTOR)?.dispatchEvent(
-		new PointerEvent("pointerdown", e.nativeEvent),
-	);
+  if (!(e.target instanceof HTMLCanvasElement)) return;
+  elementAt(e, SLIDER_SELECTOR)?.dispatchEvent(
+    new PointerEvent("pointerdown", e.nativeEvent),
+  );
 }
 
 // 🫳 :hover never reaches the tile under the canvas: flag the hovered one
 function forwardHover(
-	tile: HTMLElement | undefined,
-	hoveredRef: RefObject<HTMLElement | undefined>,
+  tile: HTMLElement | undefined,
+  hoveredRef: RefObject<HTMLElement | undefined>,
 ) {
-	if (tile === hoveredRef.current) return;
-	if (hoveredRef.current) delete hoveredRef.current.dataset.hovered;
-	if (tile) tile.dataset.hovered = "";
-	hoveredRef.current = tile;
+  if (tile === hoveredRef.current) return;
+  if (hoveredRef.current) delete hoveredRef.current.dataset.hovered;
+  if (tile) tile.dataset.hovered = "";
+  hoveredRef.current = tile;
 }
 
 // ------------------------------------------------------------------------------
 /** The page wallpaper, cropped to the area behind the menu so it lines up. */
 function Backdrop({
-	isOpened,
-	left,
-	top,
+  isOpened,
+  left,
+  top,
 }: {
-	isOpened: boolean;
-	left: number;
-	top: number;
+  isOpened: boolean;
+  left: number;
+  top: number;
 }) {
-	const { isDarkMode } = useDarkMode();
-	const windows = useWindows();
-	return (
-		<div className="relative size-full overflow-hidden">
-			<div
-				className="absolute w-screen h-screen bg-cover bg-center"
-				style={{
-					backgroundImage: `url(${isDarkMode ? wallpaperTahoeDark : wallpaperTahoeLight})`,
-					left: -left,
-					top: -top,
-				}}
-			>
-				{/* 🪟 The canvas can't see the DOM behind it, so windows are mirrored */}
-				{windows.map((window, index) => (
-					<WindowProxy
-						isOpened={isOpened}
-						// biome-ignore lint/suspicious/noArrayIndexKey: windows have no id yet
-						key={index}
-						window={window}
-					/>
-				))}
-			</div>
-			{/* ⚫ Same dimming as the CSS menu */}
-			<div className="absolute inset-0 bg-black/10 mask-x-from-50 mask-y-from-50" />
-		</div>
-	);
+  const { isDarkMode } = useDarkMode();
+  const windows = useWindows();
+  return (
+    <div className="relative size-full overflow-hidden">
+      <div
+        className="absolute w-screen h-screen bg-cover bg-center"
+        style={{
+          backgroundImage: `url(${isDarkMode ? wallpaperTahoeDark : wallpaperTahoeLight})`,
+          left: -left,
+          top: -top,
+        }}
+      >
+        {/* 🪟 The canvas can't see the DOM behind it, so windows are mirrored */}
+        {windows.map((window, index) => (
+          <WindowProxy
+            isOpened={isOpened}
+            // biome-ignore lint/suspicious/noArrayIndexKey: windows have no id yet
+            key={index}
+            window={window}
+          />
+        ))}
+      </div>
+      {/* ⚫ Same dimming as the CSS menu */}
+      <div className="absolute inset-0 bg-black/10 mask-x-from-50 mask-y-from-50" />
+    </div>
+  );
 }
 
 /** A copy of a window's surface that follows it on screen, frame by frame. */
 function WindowProxy({
-	isOpened,
-	window,
+  isOpened,
+  window,
 }: {
-	isOpened: boolean;
-	window: HTMLElement;
+  isOpened: boolean;
+  window: HTMLElement;
 }) {
-	const proxyRef = useRef<HTMLDivElement>(null);
+  const proxyRef = useRef<HTMLDivElement>(null);
 
-	// 🔁 Write styles directly: re-rendering React on every drag frame is wasteful
-	useEffect(() => {
-		const proxy = proxyRef.current;
-		if (!proxy || !isOpened) return;
-		let previous = "";
-		let frame = requestAnimationFrame(function sync() {
-			const { height, left, top, width } = window.getBoundingClientRect();
-			const next = `${left},${top},${width},${height}`;
-			// Only touch the DOM on change, every mutation repaints the canvas
-			if (next !== previous) {
-				previous = next;
-				Object.assign(proxy.style, {
-					display: width ? "block" : "none",
-					height: `${height}px`,
-					transform: `translate(${left}px, ${top}px)`,
-					width: `${width}px`,
-				});
-			}
-			frame = requestAnimationFrame(sync);
-		});
-		return () => cancelAnimationFrame(frame);
-	}, [isOpened, window]);
+  // 🔁 Write styles directly: re-rendering React on every drag frame is wasteful
+  useEffect(() => {
+    const proxy = proxyRef.current;
+    if (!proxy || !isOpened) return;
+    let previous = "";
+    let frame = requestAnimationFrame(function sync() {
+      const { height, left, top, width } = window.getBoundingClientRect();
+      const next = `${left},${top},${width},${height}`;
+      // Only touch the DOM on change, every mutation repaints the canvas
+      if (next !== previous) {
+        previous = next;
+        Object.assign(proxy.style, {
+          display: width ? "block" : "none",
+          height: `${height}px`,
+          transform: `translate(${left}px, ${top}px)`,
+          width: `${width}px`,
+        });
+      }
+      frame = requestAnimationFrame(sync);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isOpened, window]);
 
-	return (
-		<div
-			className={cn("absolute top-0 left-0 hidden", WINDOW_CLASSNAME)}
-			ref={proxyRef}
-		/>
-	);
+  return (
+    <div
+      className={cn("absolute top-0 left-0 hidden", WINDOW_CLASSNAME)}
+      ref={proxyRef}
+    />
+  );
 }
