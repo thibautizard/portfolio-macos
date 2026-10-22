@@ -7,6 +7,7 @@ import { DockTooltip } from "./components/dock-tooltip";
 import { FallbackDock } from "./components/docks/fallback-dock";
 import { LiquidDock } from "./components/docks/liquid-dock";
 import { DockContextProvider, useDockContext } from "./contexts/dock-context";
+import { DOCK_ATTRIBUTE, DOCK_MARGIN_BOTTOM } from "./hooks/use-dock-resize";
 import { regularApps, trashApp } from "./types/dock-types";
 
 export function Dock() {
@@ -23,10 +24,17 @@ export function Dock() {
 	);
 }
 
-// 📦
+// 📦 Floats over the desktop, so resizing it doesn't change the desktop's size
 function Container({ children }: { children: React.ReactNode }) {
-	const centerFixedBottom = "relative mx-auto mb-1.5 w-max";
-	return <div className={centerFixedBottom}>{children}</div>;
+	return (
+		<div
+			{...{ [DOCK_ATTRIBUTE]: "" }}
+			className="absolute inset-x-0 mx-auto w-max"
+			style={{ bottom: DOCK_MARGIN_BOTTOM }}
+		>
+			{children}
+		</div>
+	);
 }
 
 // ----------------------------------------------------------------

@@ -1,6 +1,6 @@
 import { cn } from "cn";
 import { motion } from "motion/react";
-import { type RefObject, useEffect, useRef } from "react";
+import { type RefObject, useEffect, useLayoutEffect, useRef } from "react";
 import {
   RESIZE_CURSORS,
   type ResizeEdge,
@@ -28,13 +28,25 @@ export function Window({
     if (ref.current) return registerWindow(ref.current);
   }, []);
 
-  const { dragConstraints, dragControls, startDrag, startResize, x, y } =
-    useWindowFrame({
-      minHeight,
-      minWidth,
-      parentRef,
-      windowRef: ref,
-    });
+  const {
+    dragConstraints,
+    dragControls,
+    keepAboveDock,
+    startDrag,
+    startResize,
+    x,
+    y,
+  } = useWindowFrame({
+    minHeight,
+    minWidth,
+    parentRef,
+    windowRef: ref,
+  });
+
+  // The dock may have grown while the window was closed
+  useLayoutEffect(() => {
+    if (isOpen) keepAboveDock();
+  }, [isOpen, keepAboveDock]);
 
   return (
     <motion.div

@@ -4,6 +4,7 @@ import wallpaperTahoeDark from "@/assets/macOS/wallpapers/wallpaper_tahoe_dark.a
 import wallpaperTahoeLight from "@/assets/macOS/wallpapers/wallpaper_tahoe_light.avif";
 import { AppSwitcher } from "@/components/macOS/app-switcher/app-switcher";
 import { Dock } from "@/components/macOS/dock";
+import { DOCK_AREA_HEIGHT } from "@/components/macOS/dock/hooks/use-dock-resize";
 import { useAppSelector } from "@/store/hooks";
 import { selectBrightness } from "@/store/slices/app-slice";
 import { Finder } from "../apps/finder";
@@ -27,7 +28,7 @@ export function Layout() {
       {/* ⬆️ */}
       <Header />
       {/* 🖥️ */}
-      <main className="relative grow flex flex-col">
+      <main className="relative grow min-h-0 flex flex-col">
         <Content ref={parentRef}>
           <Finder parentRef={parentRef} />
         </Content>
@@ -48,7 +49,14 @@ export function Content({
   ref: React.RefObject<HTMLDivElement | null>;
 }) {
   return (
-    <div className="relative grow grid place-items-center" ref={ref}>
+    <div
+      // min-h-0 (here and on <main>): a tall window must not stretch the desktop
+      // and push the dock down
+      className="relative grow min-h-0 grid place-items-center"
+      ref={ref}
+      // Windows are centered above the dock, whatever its size
+      style={{ paddingBottom: DOCK_AREA_HEIGHT }}
+    >
       {children}
     </div>
   );

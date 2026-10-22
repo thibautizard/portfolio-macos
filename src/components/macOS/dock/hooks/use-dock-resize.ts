@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 
+export const DOCK_MIN_HEIGHT = 75;
+export const DOCK_MAX_HEIGHT = 125;
+// Gap between the dock and the bottom of the screen
+export const DOCK_MARGIN_BOTTOM = 6;
+// Windows are centered above the biggest dock, so resizing it doesn't move them
+export const DOCK_AREA_HEIGHT = DOCK_MAX_HEIGHT + DOCK_MARGIN_BOTTOM;
+// Marks the dock, so windows can stop at its current top
+export const DOCK_ATTRIBUTE = "data-dock";
+
 // ---------------------------------------------------------------
 // ↕️ Dock resize
 export function useDockResize({ initialHeight }: { initialHeight: number }) {
@@ -22,8 +31,8 @@ export function useDockResize({ initialHeight }: { initialHeight: number }) {
 		const handleMouseMove = (e: MouseEvent) => {
 			const deltaY = startYRef.current - e.clientY;
 			const newHeight = Math.min(
-				125,
-				Math.max(75, startHeightRef.current + deltaY),
+				DOCK_MAX_HEIGHT,
+				Math.max(DOCK_MIN_HEIGHT, startHeightRef.current + deltaY),
 			);
 			setHeight(newHeight);
 		};

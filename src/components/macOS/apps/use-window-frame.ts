@@ -1,5 +1,6 @@
 import { useDragControls, useMotionValue } from "motion/react";
 import { type RefObject, useCallback, useEffect, useRef } from "react";
+import { DOCK_ATTRIBUTE } from "@/components/macOS/dock/hooks/use-dock-resize";
 
 export type ResizeEdge =
 	| "top"
@@ -60,7 +61,7 @@ export function useWindowFrame({
 			const element = windowRef.current;
 			const parent = parentRef.current;
 			if (!element || !parent) return;
-			const bounds = parent.getBoundingClientRect();
+			const bounds = desktopBounds(parent);
 			const rect = element.getBoundingClientRect();
 			Object.assign(dragConstraints, {
 				bottom: y.get() + bounds.bottom - rect.bottom,
@@ -93,7 +94,7 @@ export function useWindowFrame({
 				width: element.offsetWidth,
 			};
 			// How far each edge can go before leaving the desktop
-			const bounds = parent.getBoundingClientRect();
+			const bounds = desktopBounds(parent);
 			const rect = element.getBoundingClientRect();
 			const maxWidth = {
 				left: rect.right - bounds.left,
@@ -154,10 +155,65 @@ export function useWindowFrame({
 		[minHeight, minWidth, parentRef, windowRef, x, y],
 	);
 
-	return { dragConstraints, dragControls, startDrag, startResize, x, y };
+	// 🫸 When the dock grows into the window, push it up, then shrink it
+	// if there's no room left above (never below its min height)
+	const keepAboveDock = useCallback(() => {
+		const element = windowRef.current;
+		const parent = parentRef.current;
+		// Hidden windows are fitted when they open
+		if (!element?.offsetParent || !parent) return;
+		const bounds = desktopBounds(parent);
+		const parentTop = parent.getBoundingClientRect().top;
+		const top = parentTop + element.offsetTop + y.get();
+		const overlap = top + element.offsetHeight - bounds.bottom;
+		if (overlap <= 0) return;
+
+		const shift = Math.min(overlap, Math.max(0, top - bounds.top));
+		const height = Math.max(
+			minHeight,
+			element.offsetHeight - (overlap - shift),
+		);
+		element.style.height = `${height}px`;
+		// Read after the size change: the layout may re-center the window
+		const nextY = top - shift - parentTop - element.offsetTop;
+		y.set(nextY);
+		// Motion renders on the next frame: apply now so the dock never covers it
+		element.style.transform = `translateX(${x.get()}px) translateY(${nextY}px)`;
+	}, [minHeight, parentRef, windowRef, x, y]);
+
+	useEffect(() => {
+		const dock = document.querySelector(`[${DOCK_ATTRIBUTE}]`);
+		if (!dock) return;
+		const observer = new ResizeObserver(keepAboveDock);
+		observer.observe(dock);
+		return () => observer.disconnect();
+	}, [keepAboveDock]);
+
+	return {
+		dragConstraints,
+		dragControls,
+		keepAboveDock,
+		startDrag,
+		startResize,
+		x,
+		y,
+	};
 }
 
 // Never below the minimum, even if the window already overflows the desktop
 function clamp(value: number, min: number, max: number) {
 	return Math.max(min, Math.min(value, Math.max(min, max)));
+}
+
+// 🖥️ The desktop down to the dock's current top: windows never go behind it,
+// and get the room it frees when it shrinks
+function desktopBounds(parent: HTMLElement) {
+	const { bottom, left, right, top } = parent.getBoundingClientRect();
+	const dock = document.querySelector(`[${DOCK_ATTRIBUTE}]`);
+	return {
+		bottom: dock ? Math.min(bottom, dock.getBoundingClientRect().top) : bottom,
+		left,
+		right,
+		top,
+	};
 }

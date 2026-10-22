@@ -1,8 +1,8 @@
 import { createContext, use } from "react";
-import { useDockResize } from "../hooks/use-dock-resize";
+import { DOCK_MAX_HEIGHT, useDockResize } from "../hooks/use-dock-resize";
 import { useDockTooltip } from "../hooks/use-dock-tooltip";
 
-const INITIAL_DOCK_HEIGHT = 125;
+const INITIAL_DOCK_HEIGHT = DOCK_MAX_HEIGHT;
 
 type DockContextType = ReturnType<typeof useDockResize> &
 	ReturnType<typeof useDockTooltip>;
