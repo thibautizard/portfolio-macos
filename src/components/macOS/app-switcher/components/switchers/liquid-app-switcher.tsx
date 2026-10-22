@@ -24,9 +24,11 @@ const THICKNESS = 25;
 export function LiquidAppSwitcher({
 	children,
 	count,
+	snapshot,
 }: {
 	children: React.ReactNode;
 	count: number;
+	snapshot: string | null;
 }) {
 	const { isDarkMode } = useDarkMode();
 	const hostRef = useRef<HTMLDivElement>(null);
@@ -69,7 +71,7 @@ export function LiquidAppSwitcher({
 				<ZStack>
 					{/* 🖼️ The glass only refracts what's in the canvas */}
 					<Html sizing="fill">
-						<Backdrop {...offset} />
+						<Backdrop {...offset} snapshot={snapshot} />
 					</Html>
 					{/* 🫧 */}
 					<GlassContainer
@@ -98,14 +100,23 @@ export function LiquidAppSwitcher({
 
 // ------------------------------------------------------------------------------
 // 🖼️
-function Backdrop({ left, top }: { left: number; top: number }) {
+function Backdrop({
+	left,
+	snapshot,
+	top,
+}: {
+	left: number;
+	snapshot: string | null;
+	top: number;
+}) {
 	const { isDarkMode } = useDarkMode();
+	const wallpaper = isDarkMode ? wallpaperTahoeDark : wallpaperTahoeLight;
 	return (
 		<div className="relative size-full overflow-hidden">
 			<div
 				className="absolute w-screen h-screen bg-cover bg-center"
 				style={{
-					backgroundImage: `url(${isDarkMode ? wallpaperTahoeDark : wallpaperTahoeLight})`,
+					backgroundImage: `url(${snapshot ?? wallpaper})`,
 					left: -left,
 					top: -top,
 				}}

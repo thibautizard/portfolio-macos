@@ -12,11 +12,13 @@ import { Header } from "./header/header";
 export function Layout() {
 	const { isDarkMode } = useDarkMode();
 	const parentRef = useRef<HTMLDivElement>(null);
+	const desktopRef = useRef<HTMLDivElement>(null);
 	const brightness = useAppSelector(selectBrightness);
 
 	return (
 		<div
 			className="w-screen font-sf-pro text-sm text-white flex flex-col h-screen bg-cover bg-center"
+			ref={desktopRef}
 			style={{
 				backgroundImage: `url(${isDarkMode ? wallpaperTahoeDark : wallpaperTahoeLight})`,
 				opacity: Math.max(brightness, 0.1),
@@ -29,7 +31,7 @@ export function Layout() {
 				<Content ref={parentRef}>
 					<Finder parentRef={parentRef} />
 				</Content>
-				<AppSwitcher />
+				<AppSwitcher desktopRef={desktopRef} />
 				<Dock />
 			</main>
 		</div>
