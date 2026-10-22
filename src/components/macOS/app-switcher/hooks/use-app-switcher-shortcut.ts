@@ -4,6 +4,7 @@ import { useEffect, useEffectEvent, useState } from "react";
 // ⌥⇥ App switcher: opens on Option + Tab, stays open while Option is held
 // (Command + Tab is taken by macOS and Control + Tab by the browser).
 // Every Tab moves the focus to the next app, Shift + Tab to the previous one.
+// Hovering an app focuses it too (`focus`), and Tab carries on from there.
 // `onPrepare` fires as soon as Option goes down, to get ready before Tab.
 export function useAppSwitcherShortcut({
 	count,
@@ -47,5 +48,5 @@ export function useAppSwitcherShortcut({
 		return () => controller.abort();
 	}, [count]);
 
-	return { focusedIndex, isOpen };
+	return { focus: setFocusedIndex, focusedIndex, isOpen };
 }
